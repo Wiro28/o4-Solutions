@@ -349,17 +349,23 @@ const Questionnaire: React.FC = () => {
           onChange={(e) => setSaveUnder(e.target.value)}
           fullWidth
         />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSave}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.dark)}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.main)}
-          onMouseDown={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.light)}
-          onMouseUp={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.dark)}
-        >
-          Save
-        </Button>
+        <Box display="flex" flexDirection="column" alignItems="flex-start">
+          <Typography style={{ fontSize: '14px', marginBottom: -2 }}>The last generated Theme will be saved</Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSave}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.dark)}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.main)}
+            onMouseDown={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.light)}
+            onMouseUp={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.dark)}
+            fullWidth
+            style={{ marginTop: 0 }}
+          >
+            Save
+          </Button>
+        </Box>
+
       </Box>
 
       <Backdrop open={loading}>

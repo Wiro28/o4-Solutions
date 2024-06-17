@@ -426,20 +426,24 @@ const Adminpanel = () => {
   const isHexColor = (str: string) => /^#[0-9A-F]{6}$/i.test(str);
 
   return (
-    <Container maxWidth="md">
-      <Box display="flex" flexDirection="column" gap={3} mt={4}>
-          <Box>
-            <Box display="flex" alignItems="center">
-              <Typography variant="h4" gutterBottom style={{ marginBottom: '5px'}}>Set Tester-ID</Typography>
-              <IconWithCard cardContent="This is the ID under which the Questionnaire in the 'Questionnaire AI' Tab will be saved." showOnTop={false} />
-            </Box>
-            <TextField
-              label="ID"
-              variant="outlined"
-              value={id}
-              onChange={(e) => setId(e.target.value)}
-              fullWidth
-            />
+    <Container maxWidth={false} style={{ padding: 0 }}>
+      <Box display="flex" flexDirection="column" gap={3} mt={4} style={{ width: '75%', height: '100vh' }}>
+        <Box display="flex" flexDirection="column" gap={3} mt={4}>
+          {/* Set ID and Hosting der KI section */}
+          <Box display="flex" justifyContent="space-between" gap={3}>
+            <Box display="flex" flexDirection="column" gap={1}>
+              <Box display="flex" alignItems="center">
+                <Typography variant="h4" gutterBottom style={{ marginBottom: '5px'}}>Set Tester-ID</Typography>
+                <IconWithCard cardContent="This is the ID under which the Questionnaire in the 'Questionnaire AI' Tab will be saved." showOnTop={false} />
+              </Box>
+              <TextField
+                label="ID"
+                variant="outlined"
+                value={id}
+                onChange={(e) => setId(e.target.value)}
+                fullWidth
+              />
+            <Typography style={{fontSize: '14px' }}>Current ID: {currentId}</Typography>
             <Button
               variant="contained"
               color="primary"
@@ -448,102 +452,30 @@ const Adminpanel = () => {
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = theme.palette.primary.main}
               onMouseDown={(e) => e.currentTarget.style.backgroundColor = theme.palette.primary.light}
               onMouseUp={(e) => e.currentTarget.style.backgroundColor = theme.palette.primary.dark}
-              style={{ marginTop: '16px' }}
             >
               Set ID
             </Button>
-            <Typography style={{ marginTop: '10px' }}>Current ID: {currentId}</Typography>
-          </Box>
-        <Divider sx={{ borderBottomWidth: 3, borderColor: 'black', my: 1 }} />
-        <Box display="flex" alignItems="center">
-          <Typography variant="h4" gutterBottom>Saved Themes</Typography>
-          <IconWithCard cardContent="The themes which had been saved under their ID. The themes you see here are saved locally." showOnTop={false} />
-        </Box>
-        {loading ? (
-          <Backdrop open={loading}>
-            <CircularProgress color="inherit" />
-          </Backdrop>
-        ) : (
-          <>
-            <List>
-              {Object.entries(questionnaires).map(([category, docs]) => (
-                <Box key={category} mb={2}>
-                  <Box display="flex" alignItems="center">
-                    <Typography variant="h6" gutterBottom>
-                      {category.replace('O4S-ai-', '')}
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => {handleDeleteID(category)}}
-                      style={{ marginLeft: '10px', marginBottom: '6px' }}
-                    >
-                      Delete ID
-                    </Button>
-                  </Box>
-                  <List>
-                    {Object.keys(docs).length === 0 ? (
-                      <ListItem divider>
-                        <ListItemText primary="Keine Themes gespeichert" />
-                      </ListItem>
-                    ) : (
-                      Object.entries(docs).map(([docName]) => (
-                        <ListItem key={docName} divider>
-                          <ListItemText primary={docName} />
-                          <ListItemSecondaryAction>
-                            <Button
-                              variant="contained"
-                              color="primary"
-                              onClick={() => handleShowQuestionnaire(category, docName)}
-                              style={{ marginRight: '10px' }}
-                            >
-                              Show 
-                            </Button>
-                            <Button
-                              variant="contained"
-                              color="primary"
-                              onClick={() => handleApplyTheme(category, docName)}
-                              style={{ marginRight: '10px' }}
-                            >
-                              Apply
-                            </Button>
-                            <Button
-                              variant="contained"
-                              color="primary"
-                              onClick={() => handleDeleteTheme(category, docName)}
-                            >
-                              Delete
-                            </Button>
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      ))
-                    )}
-                  </List>
-                </Box>
-              ))}
-
-            </List>
-            {showJsonToShowPopup &&
-              <QuestionnairePopup onClose={handleClosePopup} questions={jsonToShow} />
-            }
-            <Box display="flex" justifyContent="flex-start">
-              <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {setSnackbarMessage("Are you sure you want to delete ALL entries in the database?"); setOpenDeleteAllSnackbar(true)}}
-              style={{ marginRight: '16px' }}
-            >
-            Delete all Data
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={setDefaultTheme}
-            >
-            Apply Default Theme
-            </Button>
             </Box>
-            <Divider sx={{ borderBottomWidth: 3, borderColor: 'black', my: 3 }} />
+    
+            <Box display="flex" flexDirection="column" gap={1}>
+              <Box display="flex" alignItems="center">
+                <Typography variant="h4" gutterBottom style={{ marginBottom: '5px'}}>AI Hosting</Typography>
+                <IconWithCard cardContent="Decide if you want to send a request to your local-hosted AI or to the AI on our server. Note: The AI you host locally should be run by ollama." showOnTop={true} />
+              </Box>
+              <Select style={{ width:'200px'}}
+                value={aiSourceID}
+                onChange={switchAiSource}
+                variant="outlined"
+              >
+                <MenuItem value="local">Local-Hosting</MenuItem>
+                <MenuItem value="server">Server-Hosting</MenuItem>
+              </Select>
+            </Box>
+          </Box>
+          <Divider sx={{ borderBottomWidth: 3, borderColor: 'black', my: 1, widht:'2000px' }} />
+    
+          {/* Rest of the content */}
+          <Box>
             <Box>
               <Box display="flex" alignItems="center">
                 <Typography variant="h4" gutterBottom>Questionnaire Statistics</Typography>
@@ -563,126 +495,205 @@ const Adminpanel = () => {
                       const answers = Object.entries(questionCounts[question]).sort((a, b) => b[1] - a[1]);
                       return (
                         <React.Fragment key={question}>
-                        <TableRow style={{ borderTop: '3px solid rgba(224, 224, 224, 1)' }}>
-                          <TableCell rowSpan={answers.length} style={{ fontWeight: 'bold' }}>
-                            {question}
-                          </TableCell>
-                          <TableCell>
-                            {answers[0][0]}
-                            {isHexColor(answers[0][0]) && (
-                              <div style={{ width: '20px', height: '20px', backgroundColor: answers[0][0], display: 'inline-block', marginLeft: '10px',
-                              boxShadow: theme.shadows[1], borderRadius: theme.shape.borderRadius,
-                              position: 'relative', top: '4px' }}></div>
-                            )}
-                          </TableCell>
-                          <TableCell>{answers[0][1]}</TableCell>
-                        </TableRow>
-                        {answers.slice(1).map(([answer, count]) => (
-                          <TableRow style={{ borderBottom: '3px solid rgba(224, 224, 224, 1)' }} key={answer}>
+                          <TableRow style={{ borderTop: '3px solid rgba(224, 224, 224, 1)' }}>
+                            <TableCell rowSpan={answers.length} style={{ fontWeight: 'bold' }}>
+                              {question}
+                            </TableCell>
                             <TableCell>
-                              {answer}
-                              {isHexColor(answer) && (
-                                <div style={{ width: '20px', height: '20px', backgroundColor: answer, display: 'inline-block', marginLeft: '10px',
+                              {answers[0][0]}
+                              {isHexColor(answers[0][0]) && (
+                                <div style={{ width: '20px', height: '20px', backgroundColor: answers[0][0], display: 'inline-block', marginLeft: '10px',
                                 boxShadow: theme.shadows[1], borderRadius: theme.shape.borderRadius,
                                 position: 'relative', top: '4px' }}></div>
                               )}
                             </TableCell>
-                            <TableCell>{count}</TableCell>
+                            <TableCell>{answers[0][1]}</TableCell>
                           </TableRow>
-                        ))}
-                      </React.Fragment>
+                          {answers.slice(1).map(([answer, count]) => (
+                            <TableRow style={{ borderBottom: '3px solid rgba(224, 224, 224, 1)' }} key={answer}>
+                              <TableCell>
+                                {answer}
+                                {isHexColor(answer) && (
+                                  <div style={{ width: '20px', height: '20px', backgroundColor: answer, display: 'inline-block', marginLeft: '10px',
+                                  boxShadow: theme.shadows[1], borderRadius: theme.shape.borderRadius,
+                                  position: 'relative', top: '4px' }}></div>
+                                )}
+                              </TableCell>
+                              <TableCell>{count}</TableCell>
+                            </TableRow>
+                          ))}
+                        </React.Fragment>
                       );
                     })}
                   </TableBody>
                 </Table>
               </TableContainer>
             </Box>
-          </>
-        )}
-      </Box>
-      <Divider sx={{ borderBottomWidth: 3, borderColor: 'black', my: 3 }} />
-      <Box>
-      <Box display="flex" alignItems="center">
-        <Typography variant="h4" gutterBottom style={{ marginBottom: '5px'}}>Hosting der KI</Typography>
-        <IconWithCard cardContent="Decide if you want to send a request to your local-hosted AI or to the AI on our server." showOnTop={true} />
-      </Box>
-        <Select
-          value={aiSourceID}
-          onChange={switchAiSource}
-          variant="outlined"
+            <Divider sx={{ borderBottomWidth: 3, borderColor: 'black', my: 3 }} />
+            <Box display="flex" alignItems="center">
+              <Typography variant="h4" gutterBottom>Saved Themes</Typography>
+              <IconWithCard cardContent="The themes which had been saved under their ID. The themes you see here are saved locally." showOnTop={false} />
+            </Box>
+            {loading ? (
+              <Backdrop open={loading}>
+                <CircularProgress color="inherit" />
+              </Backdrop>
+            ) : (
+              <>
+                <List>
+                  {Object.entries(questionnaires).map(([category, docs]) => (
+                    <Box key={category} mb={2}>
+                      <Box display="flex" alignItems="center">
+                        <Typography variant="h6" gutterBottom>
+                          {category.replace('O4S-ai-', '')}
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => { handleDeleteID(category) }}
+                          style={{ marginLeft: '10px', marginBottom: '6px' }}
+                        >
+                          Delete ID
+                        </Button>
+                      </Box>
+                      <List>
+                        {Object.keys(docs).length === 0 ? (
+                          <ListItem divider>
+                            <ListItemText primary="Keine Themes gespeichert" />
+                          </ListItem>
+                        ) : (
+                          Object.entries(docs).map(([docName]) => (
+                            <ListItem key={docName} divider>
+                              <ListItemText primary={docName} />
+                              <ListItemSecondaryAction>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  onClick={() => handleShowQuestionnaire(category, docName)}
+                                  style={{ marginRight: '10px' }}
+                                >
+                                  Show
+                                </Button>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  onClick={() => handleApplyTheme(category, docName)}
+                                  style={{ marginRight: '10px' }}
+                                >
+                                  Apply
+                                </Button>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  onClick={() => handleDeleteTheme(category, docName)}
+                                >
+                                  Delete
+                                </Button>
+                              </ListItemSecondaryAction>
+                            </ListItem>
+                          ))
+                        )}
+                      </List>
+                    </Box>
+                  ))}
+                </List>
+                {showJsonToShowPopup &&
+                  <QuestionnairePopup onClose={handleClosePopup} questions={jsonToShow} />
+                }
+                <Box display="flex" justifyContent="flex-start">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => { setSnackbarMessage("Are you sure you want to delete ALL entries in the database?"); setOpenDeleteAllSnackbar(true) }}
+                    style={{ marginRight: '16px' }}
+                  >
+                    Delete all Data
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={setDefaultTheme}
+                  >
+                    Apply Default Theme
+                  </Button>
+                </Box>
+              </>
+            )}
+          </Box>
+
+        </Box>
+        
+        {/* Snackbars */}
+        <Snackbar
+          open={openSuccessSnackbar}
+          autoHideDuration={6000}
+          onClose={() => setOpenSuccessSnackbar(false)}
         >
-          <MenuItem value="local">Local-Hosting</MenuItem>
-          <MenuItem value="server">Server-Hosting</MenuItem>
-        </Select>
+          <Alert onClose={() => setOpenSuccessSnackbar(false)} severity="success">
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+        <Snackbar open={openWarningSnackbar} autoHideDuration={6000} onClose={() => setWarningSnackbar(false)}>
+          <Alert onClose={() => setWarningSnackbar(false)} severity="warning">
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+        <Snackbar open={openIDSnackbar} autoHideDuration={6000} onClose={() => setOpenIDSnackbar(false)}>
+          <Alert onClose={() => setOpenIDSnackbar(false)} severity="warning">
+            ID already in use. Do you want to force set this ID?
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleForceSetId}
+              style={{ marginLeft: '16px' }}
+            >
+              Force Set ID
+            </Button>
+          </Alert>
+        </Snackbar>
+        <Snackbar open={openDeleteAllSnackbar} autoHideDuration={6000} onClose={() => setOpenDeleteAllSnackbar(false)}>
+          <Alert onClose={() => setOpenDeleteAllSnackbar(false)} severity="warning">
+            {snackbarMessage}
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleDeleteEverything}
+              style={{ marginLeft: '16px' }}
+            >
+              DELETE
+            </Button>
+          </Alert>
+        </Snackbar>
+        <Snackbar open={openUndoDeleteThemeSnackbar} autoHideDuration={6000} onClose={() => setOpenUndoDeleteThemeSnackbar(false)}>
+          <Alert onClose={() => setOpenUndoDeleteThemeSnackbar(false)} severity="warning">
+            {snackbarMessage}
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {handleUndoDeleteTheme(); setOpenUndoDeleteThemeSnackbar(false)}}
+              style={{ marginLeft: '16px' }}
+            >
+              UNDO
+            </Button>
+          </Alert>
+        </Snackbar>
+        <Snackbar open={openUndoDeleteIDSnackbar} autoHideDuration={6000} onClose={() => setOpenUndoDeleteIDSnackbar(false)}>
+          <Alert onClose={() => setOpenUndoDeleteIDSnackbar(false)} severity="warning">
+            {snackbarMessage}
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {handleUndoDeleteID(); setOpenUndoDeleteIDSnackbar(false)}}
+              style={{ marginLeft: '16px' }}
+            >
+              UNDO
+            </Button>
+          </Alert>
+        </Snackbar>
       </Box>
-      <Snackbar
-        open={openSuccessSnackbar}
-        autoHideDuration={6000}
-        onClose={() => setOpenSuccessSnackbar(false)}
-      >
-        <Alert onClose={() => setOpenSuccessSnackbar(false)} severity="success">
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-      <Snackbar open={openWarningSnackbar} autoHideDuration={6000} onClose={() => setWarningSnackbar(false)}>
-        <Alert onClose={() => setWarningSnackbar(false)} severity="warning">
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-      <Snackbar open={openIDSnackbar} autoHideDuration={6000} onClose={() => setOpenIDSnackbar(false)}>
-        <Alert onClose={() => setOpenIDSnackbar(false)} severity="warning">
-          ID already in use. Do you want to force set this ID?
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleForceSetId}
-            style={{ marginLeft: '16px' }}
-          >
-            Force Set ID
-          </Button>
-        </Alert>
-      </Snackbar>
-      <Snackbar open={openDeleteAllSnackbar} autoHideDuration={6000} onClose={() => setOpenDeleteAllSnackbar(false)}>
-        <Alert onClose={() => setOpenDeleteAllSnackbar(false)} severity="warning">
-          {snackbarMessage}
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleDeleteEverything}
-            style={{ marginLeft: '16px' }}
-          >
-            DELETE
-          </Button>
-        </Alert>
-      </Snackbar>
-      <Snackbar open={openUndoDeleteThemeSnackbar} autoHideDuration={6000} onClose={() => setOpenUndoDeleteThemeSnackbar(false)}>
-        <Alert onClose={() => setOpenUndoDeleteThemeSnackbar(false)} severity="warning">
-          {snackbarMessage}
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {handleUndoDeleteTheme(); setOpenUndoDeleteThemeSnackbar(false)}}
-            style={{ marginLeft: '16px' }}
-          >
-            UNDO
-          </Button>
-        </Alert>
-      </Snackbar>
-      <Snackbar open={openUndoDeleteIDSnackbar} autoHideDuration={6000} onClose={() => setOpenUndoDeleteIDSnackbar(false)}>
-        <Alert onClose={() => setOpenUndoDeleteIDSnackbar(false)} severity="warning">
-          {snackbarMessage}
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {handleUndoDeleteID(); setOpenUndoDeleteIDSnackbar(false)}}
-            style={{ marginLeft: '16px' }}
-          >
-            UNDO
-          </Button>
-        </Alert>
-      </Snackbar>
     </Container>
   );
-};
+  
+                }
 
 export default Adminpanel;
