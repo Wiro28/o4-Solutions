@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TwitterPicker } from 'react-color';
+import { SketchPicker } from 'react-color';
 
 interface ColorPickerProps {
   initialColor?: string;
@@ -16,7 +16,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ initialColor = '', onChange }
 
   return (
     <div>
-      <TwitterPicker color={color} onChange={handleColorChange} />
+      <SketchPicker color={color} onChange={handleColorChange} />
     </div>
   );
 };
