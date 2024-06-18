@@ -97,6 +97,12 @@ async function retryAskAI(AIprompt: string, preferences: any, temperature: numbe
           const jsonResponse = JSON.parse(extractedJSON);
           console.log(`Valid JSON found on attempt ${attempt}`);
 
+          if (Object.keys(jsonResponse).length === 0) {
+            console.warn(`Attempt ${attempt} failed: JSON is empty.`);
+            AIprompt = generateAIPrompt(preferences, response);
+            continue;
+          }
+
           if (!hasEmptyStrings(jsonResponse)) {
             return jsonResponse;
           } else {

@@ -9,9 +9,9 @@ interface Props {
 // Erstellen des ThemeContexts
 export const ThemeContext = React.createContext({
   mode: 'light',
-  toggleColorMode: () => {},
+  toggleColorMode: () => { },
   themeConfig: null,
-  applyTheme: (config: any) => {},
+  applyTheme: (config: any) => { },
 });
 
 // Hauptkomponente
@@ -40,17 +40,30 @@ const ToggleColorMode = ({ children }: Props) => {
   );
 
   // Erstellen des Themes
-  const theme = useMemo(
-    () =>
-      createTheme({
-        ...themeConfig,
-        palette: {
-          ...themeConfig?.palette,
-          mode,
-        },
-      }),
-    [mode, themeConfig]
-  );
+  const theme = useMemo(() => {
+    // Default palette settings for dark mode
+    const defaultDarkPalette = {
+      background: {
+        default: "#121212",
+        paper: "#1d1d1d",
+      },
+      text: {
+        primary: "#ffffff",
+      },
+    };
+
+    // Merge custom themeConfig with the mode-specific settings
+    const mergedTheme = createTheme({
+      ...themeConfig,
+      palette: {
+        ...themeConfig?.palette,
+        mode,
+        ...(mode === 'dark' ? defaultDarkPalette : {}),
+      },
+    });
+
+    return mergedTheme;
+  }, [mode, themeConfig]);
 
   // Rendern der Komponente
   return (

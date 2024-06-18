@@ -24,6 +24,7 @@ export async function askAI(AIprompt: string, aiSource: string, temperature: num
     try {
         switch (aiSource) {
             case ("local"):
+                console.log("Lokalen KI Anfrage")
                 errormessage = "Lokalen KI Anfrage"
                 // Erstellen und Senden der Anfrage
                 response = await openai.chat.completions.create({
@@ -35,6 +36,7 @@ export async function askAI(AIprompt: string, aiSource: string, temperature: num
                 });
                 return response.choices[0].message.content;
             case ("server"):
+                console.log("Server KI Anfrage")
                 errormessage = "Server KI Anfrage"
                 responseserver = await openaiserver.chat.completions.create({
                     model: "codestral",

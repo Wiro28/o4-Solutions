@@ -49,7 +49,7 @@ const jsonCode = `
   "shape": {
     "borderRadius": 4
   },
-  "components": {
+  "components": { 
     "MuiBox": {
       "styleOverrides": {
         "root": {
@@ -204,17 +204,20 @@ function generateAIPrompt(preferences: Preferences, previousResponse: string | n
     messages: [
       { role: 'system', content: 'You are an AI designed to generate MUI theme configurations based on a given template. Change the given template and generate a new MUI theme configuration.' },
       { role: 'user', content: `Interpret the user preferences into UI/UX guidelines and generate a MUI theme configuration based on those guidelines. User preferences: ${JSON.stringify(preferences, null, 2)}` },
-      { role: 'user', content: `The "Farbgewichtung" parameter means: a higher number means to use only the selected color and maybe a second color.  A lower number means to use as many colors as you wish to combine. For a high color weight, use primarily the primary color and at most one other color. For a low color weight, use a wider range of colors and combine them as you wish) that fit into the color scheme for the background, primary, and secondary colors.` },
+      { role: 'user', content: `The "Farbgewichtung" parameter means: a higher number means to use only the selected color and maybe a second color. A lower number means to use as many colors as you wish to combine. For a high color weight, use primarily the primary color and at most one other color. For a low color weight, use a wider range of colors and combine them as you wish) that fit into the color scheme for the background, primary, and secondary colors.` },
       { role: 'user', content: `Also, consider light and dark mode changes. The default is light mode, but the theme configuration JSON colors should reflect the change when switching to dark mode.` },
-      { role: 'user', content: `Template for the MUI Theme Configuration JSON (Be sure to use this only as a reference, dont keep the default options given here): ${jsonCode}` },
+      { role: 'user', content: `Template for the MUI Theme Configuration JSON (Be sure to use this only as a reference, don't keep the default options given here): ${jsonCode}` },
       { role: 'user', content: `The current theme chosen is "${preferences[4].answer}", which should be interpreted as "${themeDescription}". The chosen theme in the user preferences should be interpreted and UI/UX guidelines should be generated. Ensure distinct and visible changes between themes.` },
       { role: 'user', content: `The font theme means not a specific theme but rather a vibe which the theme should have. Choose a specific theme you see fit. But don't use a standard font, choose something that fits the chosen vibe and also is very distinct and not default. The available fonts for this theme are: ${fontList.join(', ')}` },
       { role: 'user', content: `Everything should be filled out in a way that makes sense and with good UI/UX.` },
       { role: 'user', content: `Pay special attention to color contrast: ensure that if there is a light background, the text is dark, and if there is a dark background, the text is light.` },
-      { role: 'user', content: `Be sure to *always* change the layout of the website (Through Flexdirection, display and all the other options given in the template JSON) as well to your liking. So that it drastically improves the UX.` },
-      { role: 'user', content: `Never leave the default options or empty strings or null and never leave any placeholders.` }
-    ]       
-  });  
+      { role: 'user', content: `Be sure to *always* change the layout of the website (Through Flexdirection, display and similar stuff) as well. So that it drastically improves the UX. Don't change stuff like margin too much or content will be unreadable` },
+      { role: 'user', content: `Change the layout/positioning and most importantly order of components noticeably. Like reverse it or change from column to row and stuff.` },
+      { role: 'user', content: `Never leave the default options or empty strings or null and never leave any placeholders.` },
+      { role: 'user', content: `Check if there are any invalid/illegal functions or things in the MUI Theme Config JSON.` },
+      { role: 'user', content: `Avoid Unsupported color errors` }
+    ]
+  });
 }
 
 export { generateAIPrompt };
