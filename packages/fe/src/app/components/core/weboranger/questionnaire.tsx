@@ -18,6 +18,9 @@ import Backdrop from '@mui/material/Backdrop';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
+import {User} from "@app/shared/types/core/user/user";
+import {useUser} from "@frontend/hooks/use-user"
+
 interface Question {
   id: number;
   text: string;
@@ -84,6 +87,7 @@ const Questionnaire: React.FC = () => {
   const [currentId, setCurrentId] = useState<string>(() => {
     return localStorage.getItem('currentId') || '';
   });
+  const [personaData] = useUser();
 
   useEffect(() => {
     fetchCurrentTheme();
@@ -204,16 +208,23 @@ const Questionnaire: React.FC = () => {
     });
   };
 
+  function handleTest(): void {
+    console.log("Hallo", personaData.displayName);
+    console.log("Deine ID ist: ", personaData.userId)
+  }
+
   const handleSave = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setLoading(true);
+    const personaName = personaData.displayName;
+    console.log("PersonaName in Questionnaire: ", personaName)
     try {
       const response = await fetch('http://localhost:3000/api/save-questionnaire', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: responses, saveUnder }),
+        body: JSON.stringify({ message: responses, saveUnder, personaName }),
       });
       if (!response.ok) {
         throw new Error('Fehler bei: /api/save-questionnaire');
@@ -327,7 +338,13 @@ const Questionnaire: React.FC = () => {
             step={0.1}
           />
         </Box>
-
+        <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleTest}
+                                  >
+                                    TEST
+                                  </Button>
         <Button
           variant="contained"
           color="primary"

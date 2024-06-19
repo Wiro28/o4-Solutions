@@ -26,26 +26,16 @@ let lastDeletedThemeData : DeletedThemeData | null = null;
 interface DeletedThemeData {
   id: string;
   docName: string;
-  themeandquestionnaire: {
-    json: any;  
-    questionnaire: any;  
-  };
+  themeandquestionnaire: doc;
 }
 
 //Die ID welche zuletzt gelöscht wurde
 let lastDeletedIdData : DeletedIDData | null = null;
 
-interface Theme {
-  doc: {
-    json: object;
-    questionnaire: object;
-  };
-}
-
 interface DeletedIDData {
   id: string;
   themes: {
-    [key: string]: Theme;
+    [key: string]: doc;
   };
 }
 
@@ -175,7 +165,7 @@ app.post('/api/force-set-ID', async (req, res) => {
 // Speichert questionaire und json direkt ab
 app.post('/api/save-questionnaire', async (req, res) => {
   const data = req.body;
-
+  console.log("PersonName in main.ts: ", data.personaName)
   if (!data.saveUnder) {
     res.json({ success: false, message: "Please choose a name under which to save the theme!" })
   } else if (!currentID) {
@@ -185,7 +175,7 @@ app.post('/api/save-questionnaire', async (req, res) => {
   } else if (await checkIfDocIsExisting(currentID, data.saveUnder)) {
     res.json({ success: false, message: "Name for the theme with this ID already in use!" })
   } else {
-    await saveDoc(currentID, data.saveUnder, latestGeneratedTheme, data.message)
+    await saveDoc(currentID, data.saveUnder, latestGeneratedTheme, data.message, data.personaName)
     res.json({ success: true, message: "Theme saved successfully!" })
   }
 });
@@ -234,7 +224,7 @@ app.post('/deleteDoc', async (req, res) => {
   const data = req.body
   const themeandquestionnaire = await getDoc(data.category, data.docName);
   if (themeandquestionnaire){
-    lastDeletedThemeData = { id : data.category, docName : data.docName, themeandquestionnaire : { json: themeandquestionnaire.json, questionnaire: themeandquestionnaire.questionnaire}}
+    lastDeletedThemeData = { id : data.category, docName : data.docName, themeandquestionnaire : { json: themeandquestionnaire.json, questionnaire: themeandquestionnaire.questionnaire, personaName : themeandquestionnaire.personaName}}
     await deleteDoc(data.category, data.docName)
     res.json({ success: true })
   } else {
@@ -244,7 +234,7 @@ app.post('/deleteDoc', async (req, res) => {
 
 app.put('/undoDeleteDoc', async (req, res) => {
   if(lastDeletedThemeData) {
-    saveDoc(lastDeletedThemeData.id.replace('O4S-ai-', ''), lastDeletedThemeData.docName, lastDeletedThemeData.themeandquestionnaire.json, lastDeletedThemeData.themeandquestionnaire.questionnaire)
+    saveDoc(lastDeletedThemeData.id.replace('O4S-ai-', ''), lastDeletedThemeData.docName, lastDeletedThemeData.themeandquestionnaire.json, lastDeletedThemeData.themeandquestionnaire.questionnaire, lastDeletedThemeData.themeandquestionnaire.personaName)
     res.status(200).json({ success: true, ok: true });
     lastDeletedThemeData = null;
   } else {
@@ -268,7 +258,7 @@ app.put('/undoDeleteID', async (req, res) => {
   if(lastDeletedIdData) {
     for (const key in lastDeletedIdData.themes) {
       const keyAsString = key;
-      saveDoc(lastDeletedIdData.id.replace('O4S-ai-', ''), keyAsString, lastDeletedIdData.themes[key].doc.json, lastDeletedIdData.themes[key].doc.questionnaire);
+      saveDoc(lastDeletedIdData.id.replace('O4S-ai-', ''), keyAsString, lastDeletedIdData.themes[key].json, lastDeletedIdData.themes[key].questionnaire, lastDeletedIdData.themes[key].personaName);
     }
     res.status(200).json({ success: true, ok: true });
     lastDeletedIdData = null

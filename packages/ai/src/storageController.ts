@@ -8,12 +8,14 @@ import {getConfiguredDocumentStore} from '../../be/src/infrastructure/configured
 const prefix = "O4S-ai-"
 const documentStore = getConfiguredDocumentStore();
 //speichert die json für applytheme mit dem questionaire datei basierend auf einer id und einem Namen
-export async function saveDoc(id: string, name : string, json: any, questionnaire : any) {
+export async function saveDoc(id: string, name : string, json: any, questionnaire : any, personaName : string) {
   const fullId = `${prefix}${id}`
+  console.log(personaName)
 
-  const doc = {
+  const doc : doc = {
     questionnaire : questionnaire,
-    json : json
+    json : json,
+    personaName : personaName
   }
 
   await documentStore.addDoc(fullId, name, doc);
@@ -32,7 +34,8 @@ export async function saveDoc(id: string, name : string, json: any, questionnair
 //Hier muss der präfix nicht gesetzt werden weil man den präfix schon in der id mit übergibt
 export interface doc {
   json: any;  
-  questionnaire: any;  
+  questionnaire: any;
+  personaName: any;  
   
 }
 
