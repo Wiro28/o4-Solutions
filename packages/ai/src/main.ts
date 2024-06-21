@@ -2,7 +2,7 @@ import express from 'express';
 import { askAI } from './aiInterface';
 import cors from 'cors';
 import { generateAIPrompt } from './promptGenerator';
-import { saveDoc, getDoc, checkIfIDInUse, checkIfDocIsExisting, getAllDocs, deleteEverything, deleteDoc, deleteID, getAiSource, setAiSource, getAllDocsForSpecificId, doc } from './storageController';
+import { saveDoc, getDoc, checkIfIDInUse, checkIfDocIsExisting, getAllDocs, deleteEverything, deleteDoc, deleteID, getAiSource, setAiSource, getAllDocsForSpecificId, doc, savePersonaUnderID } from './storageController';
 
 // Erstellen einer neuen Express-Anwendung
 const app = express();
@@ -16,6 +16,9 @@ let applyedTheme = {};
 
 // Die ID mit der der User gerade "angemeldet" ist
 let currentID: string;
+
+// Die Persona mit der die ID abgespeichert wird. Standartmäßig die Standart Persona
+let currentPersona: string;
 
 //Ist nur true während die AI eine Anfrage bearbeitet
 let isAiLoading = false;
@@ -149,6 +152,7 @@ app.post('/api/try-set-id', async (req, res) => {
     res.json({ success: false, idInUse: true, message: "Die ID ist bereits in verwendung" })
   } else {
     currentID = data.id
+    await savePersonaUnderID(currentID, currentPersona)
     //console.log(`Die jetzige ID nach try-set-id ist: ${currentID}`)
     res.json({ success: true, idInUse: false, message: "Alles supi" })
 
@@ -158,14 +162,29 @@ app.post('/api/try-set-id', async (req, res) => {
 app.post('/api/force-set-ID', async (req, res) => {
   const data = req.body;
   currentID = data.id
+  await savePersonaUnderID(currentID, currentPersona)
   res.json({ success: true })
   //console.log(`Die jetzige ID ist nach force-set-id ist: ${currentID}`)
+});
+
+app.post('/api/setPersona', async (req, res) => {
+  const data = req.body;
+  currentPersona = data.selectedPersona
+  console.log(data.selectedPersona)
+  res.json({ success: true })
+});
+
+app.get('/api/getPersona', async (req, res) => {
+  if (!currentPersona) {
+    res.json({ currentPersona: "" })
+  } else {
+    res.json({ currentPersona })
+  }
 });
 
 // Speichert questionaire und json direkt ab
 app.post('/api/save-questionnaire', async (req, res) => {
   const data = req.body;
-  console.log("PersonName in main.ts: ", data.personaName)
   if (!data.saveUnder) {
     res.json({ success: false, message: "Please choose a name under which to save the theme!" })
   } else if (!currentID) {
@@ -175,7 +194,7 @@ app.post('/api/save-questionnaire', async (req, res) => {
   } else if (await checkIfDocIsExisting(currentID, data.saveUnder)) {
     res.json({ success: false, message: "Name for the theme with this ID already in use!" })
   } else {
-    await saveDoc(currentID, data.saveUnder, latestGeneratedTheme, data.message, data.personaName)
+    await saveDoc(currentID, data.saveUnder, latestGeneratedTheme, data.message)
     res.json({ success: true, message: "Theme saved successfully!" })
   }
 });
@@ -224,7 +243,7 @@ app.post('/deleteDoc', async (req, res) => {
   const data = req.body
   const themeandquestionnaire = await getDoc(data.category, data.docName);
   if (themeandquestionnaire){
-    lastDeletedThemeData = { id : data.category, docName : data.docName, themeandquestionnaire : { json: themeandquestionnaire.json, questionnaire: themeandquestionnaire.questionnaire, personaName : themeandquestionnaire.personaName}}
+    lastDeletedThemeData = { id : data.category, docName : data.docName, themeandquestionnaire : { json: themeandquestionnaire.json, questionnaire: themeandquestionnaire.questionnaire}}
     await deleteDoc(data.category, data.docName)
     res.json({ success: true })
   } else {
@@ -234,7 +253,7 @@ app.post('/deleteDoc', async (req, res) => {
 
 app.put('/undoDeleteDoc', async (req, res) => {
   if(lastDeletedThemeData) {
-    saveDoc(lastDeletedThemeData.id.replace('O4S-ai-', ''), lastDeletedThemeData.docName, lastDeletedThemeData.themeandquestionnaire.json, lastDeletedThemeData.themeandquestionnaire.questionnaire, lastDeletedThemeData.themeandquestionnaire.personaName)
+    saveDoc(lastDeletedThemeData.id.replace('O4S-ai-', ''), lastDeletedThemeData.docName, lastDeletedThemeData.themeandquestionnaire.json, lastDeletedThemeData.themeandquestionnaire.questionnaire)
     res.status(200).json({ success: true, ok: true });
     lastDeletedThemeData = null;
   } else {
@@ -258,7 +277,7 @@ app.put('/undoDeleteID', async (req, res) => {
   if(lastDeletedIdData) {
     for (const key in lastDeletedIdData.themes) {
       const keyAsString = key;
-      saveDoc(lastDeletedIdData.id.replace('O4S-ai-', ''), keyAsString, lastDeletedIdData.themes[key].json, lastDeletedIdData.themes[key].questionnaire, lastDeletedIdData.themes[key].personaName);
+      saveDoc(lastDeletedIdData.id.replace('O4S-ai-', ''), keyAsString, lastDeletedIdData.themes[key].json, lastDeletedIdData.themes[key].questionnaire);
     }
     res.status(200).json({ success: true, ok: true });
     lastDeletedIdData = null
