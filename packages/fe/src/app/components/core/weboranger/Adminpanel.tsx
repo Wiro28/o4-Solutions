@@ -23,7 +23,7 @@ const Adminpanel = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [openIDSnackbar, setOpenIDSnackbar] = useState(false);
   const [openDeleteAllSnackbar, setOpenDeleteAllSnackbar] = useState(false);
-  const [openUndoDeleteIDSnackbar, setOpenUndoDeleteIDSnackbar] = useState(false);
+  const [openUndoDeleteIDSnackbar,  setOpenUndoDeleteIDSnackbar] = useState(false);
   const [openUndoDeleteThemeSnackbar, setOpenUndoDeleteThemeSnackbar] = useState(false);
   const [openWarningSnackbar, setWarningSnackbar] = useState(false);
   const [aiSourceID, setAiSourceID] = useState('');

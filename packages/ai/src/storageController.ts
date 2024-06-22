@@ -31,6 +31,16 @@ export async function savePersonaUnderID(id: string, personaName : string) {
   await documentStore.addDoc(fullId, "personaData", {personaName})
 }
 
+export interface personaData {
+  doc : {
+    personaName: string
+  }
+}
+export async function getPersonaForID(id: string) : Promise<personaData | null>{
+  const personaData : personaData | null = await documentStore.getDoc(id, "personaData");
+  return personaData;
+}
+
 //returnt eine json datei basierend auf einer id
 //format: { questionnaire: {...}, json: {...}}
 //Questionnaire sind die fragen und die json ist die json die man 1:1 so in applyTheme setzen kann
@@ -70,8 +80,9 @@ export async function getAllDocs() :  Promise<any> {
 
 export async function getAllDocsForSpecificId(docId: string) {
   const docs = await documentStore.getAllO4SaiDocs();
-
   if (docs.hasOwnProperty(docId)) {
+    console.log("getAllDocsForSpecificId: ", docId)
+    console.log("getAllDocsForSpecificId: An stelle docID ", docs[docId])
     return docs[docId];
   } else {
     throw new Error(`Document with ID ${docId} not found`);
