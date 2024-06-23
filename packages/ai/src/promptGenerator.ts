@@ -165,23 +165,23 @@ interface Preferences {
 }
 
 const fontMapping: { [key: string]: string[] } = {
-  playful: ['Pacifico', 'Baloo 2', 'Caveat'],
-  simple: ['Open Sans', 'Lato', 'Montserrat'],
-  mechanical: ['Roboto Mono', 'Source Code Pro', 'Fira Code'],
-  rounded: ['Nunito', 'Quicksand', 'Comic Neue'],
-  elegant: ['Playfair Display', 'Merriweather', 'Abril Fatface'],
-  dramatic: ['Bebas Neue', 'Righteous', 'Bungee'],
-  factual: ['Roboto', 'Inter', 'Ubuntu']
+  playful: ['Pacifico', 'Baloo 2', 'Caveat', 'Indie Flower', 'Dancing Script', 'Fredoka'],
+  simple: ['Open Sans', 'Lato', 'Montserrat', 'Raleway', 'Josefin Sans', 'Work Sans'],
+  mechanical: ['Roboto Mono', 'Source Code Pro', 'Fira Code', 'Inconsolata', 'Space Mono', 'DM Mono'],
+  rounded: ['Nunito', 'Quicksand', 'Comic Neue', 'Poppins', 'M PLUS Rounded 1c', 'Arimo'],
+  elegant: ['Playfair Display', 'Merriweather', 'Abril Fatface', 'EB Garamond', 'Alex Brush', 'Bodoni Moda'],
+  dramatic: ['Bebas Neue', 'Righteous', 'Bungee', 'Amatic SC', 'Staatliches', 'Monoton'],
+  factual: ['Roboto', 'Inter', 'Ubuntu', 'Noto Sans', 'Manrope']
 };
 
 const themeMapping: { [key: string]: string } = {
-  'Serious': 'serious and professional',
-  'Energetic': 'energetic and vibrant',
-  'Cheerful': 'joyful and playful',
-  'Nature-oriented': 'nature-oriented and earthy',
-  'Technical': 'technical and modern',
-  'Minimalistic': 'minimalistic and clean',
-  'Premium': 'premium and luxurious'
+  'Serious': 'darker colors, light background, black lettering, corners, no bright colors, only the colors red, blue, black and white may be used be used (with their gradations), it is factual and only the most the most important is displayed without decoration possible user description: neat and factual',
+  'Energetic': 'bright colors, black only in the font, but the font can also be can also be colorful, modern design, corners are rounded, organic shapes rounded, organic shapes, color transitions, especially working with yellow, red and orange tones possible user description: powerful and colorful',
+  'Cheerful': 'bold colors, playful font, no corners possible user description: cheerful and radiant design',
+  'Nature-oriented': 'green and brown tones, background is in light colors, organic shapes, colors appear in different opacity possible user description: simple and organic',
+  'Technical': 'rather work with blue gray and tones, everything angular no roundings, looks machine-made possible user description: highly organized and mechanical',
+  'Minimalistic': 'colors don`t matter, focus on the essentials, no transitions, black text on a white background possible user description: simple and reduced',
+  'Premium': 'minimalistic, it is factual and only the most important things are important things are changed, warm colors and black and white tones are used corners are rounded off possible user description: simple, but special'
 };
 
 function generateFontList(preferences: Preferences): string[] {

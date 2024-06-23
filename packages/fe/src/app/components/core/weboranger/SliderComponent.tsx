@@ -1,7 +1,6 @@
 import React from 'react';
 import Slider from '@mui/material/Slider';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 
 interface SliderComponentProps {
   value: number;
@@ -11,6 +10,7 @@ interface SliderComponentProps {
   step?: number;
   scale?: boolean;
   percentage?: boolean;
+  label?: string;
 }
 
 const SliderComponent: React.FC<SliderComponentProps> = ({
@@ -19,18 +19,17 @@ const SliderComponent: React.FC<SliderComponentProps> = ({
   min,
   max,
   step = 1,
-  scale,
   percentage,
 }) => {
   const handleChange = (event: Event, newValue: number | number[]) => {
-    if (scale && percentage) {
+    if (percentage) {
       onChange((newValue as number) / 100 * (max - min) + min);
     } else {
       onChange(newValue as number);
     }
   };
 
-  const scaledValue = scale && percentage ? ((value - min) / (max - min)) * 100 : value;
+  const scaledValue = percentage ? ((value - min) / (max - min)) * 100 : value;
 
   const marks = percentage
     ? [
@@ -49,8 +48,8 @@ const SliderComponent: React.FC<SliderComponentProps> = ({
         aria-labelledby="input-slider"
         value={scaledValue}
         onChange={handleChange}
-        min={percentage ? 0 : min}
-        max={percentage ? 100 : max}
+        min={0}
+        max={100}
         marks={marks}
         step={step}
       />

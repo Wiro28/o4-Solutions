@@ -325,6 +325,7 @@ const Questionnaire: React.FC = () => {
             min={0.1}
             max={0.9}
             step={0.1}
+            percentage
           />
         </Box>
 
