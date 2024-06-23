@@ -23,6 +23,6 @@ export const Personas: Persona[] = [
     email: 'admin@example.local',
     roles: ['Admin'],
     avatar: '/assets/account-circle-outline.svg',
-    description: 'Admin.'
+    description: 'The Admin manages the settings, as well as the saved Themes of the Questionnaire.'
   }
 ];

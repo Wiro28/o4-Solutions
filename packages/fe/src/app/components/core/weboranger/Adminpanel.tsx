@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Button, CircularProgress, Container, Typography, Backdrop, Snackbar, List, ListItem, ListItemText, ListItemSecondaryAction, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, useTheme, Divider, Select, MenuItem } from '@mui/material';
+import { Box, Button, CircularProgress, Container, Typography, Backdrop, Snackbar, List, ListItem, ListItemText, ListItemSecondaryAction, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, useTheme, Divider, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { ThemeContext } from '@frontend/app/providers/ToggleColorMode';
 import theme from "@frontend/extensions/app/layout/theme";
 import IconWithCard from './IconWithCard';
 import QuestionnairePopup from "./QuestionnairePopup";
+import {Personas} from "@app/shared/extensions/personas"
+import { relative } from "path";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -21,12 +23,13 @@ const Adminpanel = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [openIDSnackbar, setOpenIDSnackbar] = useState(false);
   const [openDeleteAllSnackbar, setOpenDeleteAllSnackbar] = useState(false);
-  const [openUndoDeleteIDSnackbar, setOpenUndoDeleteIDSnackbar] = useState(false);
+  const [openUndoDeleteIDSnackbar,  setOpenUndoDeleteIDSnackbar] = useState(false);
   const [openUndoDeleteThemeSnackbar, setOpenUndoDeleteThemeSnackbar] = useState(false);
   const [openWarningSnackbar, setWarningSnackbar] = useState(false);
   const [aiSourceID, setAiSourceID] = useState('');
   const [jsonToShow, setJsonToShow] = useState({});
   const [showJsonToShowPopup, setShowJsonToShowPopup] = useState(false);
+  const [selectedPersona, setSelectedPersona] = useState('');
   //Die aktuelle ID die in Server gespeichert ist und unter der die Daten in der Datenbank gespeichert werden
   const [currentId, setCurrentId] = useState<string>(() => {
     return localStorage.getItem('currentId') || '';
@@ -37,7 +40,20 @@ const Adminpanel = () => {
     fetchCurrentTheme();
     fetchAiSource();
     fetchCurrentId();
+    fetchCurrentPersona();
   }, []);
+
+  const fetchCurrentPersona = async () => {    try {
+    const response = await fetch('http://localhost:3000/api/getPersona');
+    if (!response.ok) {
+      throw new Error('Fehler bei: /getPersona');
+    }
+    const data = await response.json();
+    setSelectedPersona(data.currentPersona);
+    } catch (error) {
+      console.error('Error fetching aiSource:', error);
+    }
+  }
 
   const fetchAiSource = async () => {    try {
     const response = await fetch('http://localhost:3000/getAiSource');
@@ -142,6 +158,7 @@ const Adminpanel = () => {
       }
       await response.json();
       setQuestionnaires({});
+      setOpenDeleteAllSnackbar(false);
       setSnackbarMessage("All entries deleted successfully");
       setOpenSuccessSnackbar(true);
     } catch (error) {
@@ -154,8 +171,6 @@ const Adminpanel = () => {
 
   const handleDeleteTheme = async (category: string, docName: string) => {
     try {
-      console.log("Übergebene category: ", category)
-      console.log("Übergebene docName: ", docName)
       const response = await fetch('http://localhost:3000/deleteDoc', {
         method: 'POST',
         headers: {
@@ -229,9 +244,9 @@ const Adminpanel = () => {
               question: string;
               answer: string;
             };
-          };
-        };
-      };
+          }, personaName: string
+        }
+      }
     };
   }
 
@@ -245,12 +260,15 @@ const Adminpanel = () => {
     const questionCounts: QuestionCounts = {};
 
     Object.keys(questionnaires).forEach(category => {
-      Object.keys(questionnaires[category]).forEach(doc => {
+      // Filtere die Schlüssel, um 'personaData' auszuschließen
+      const docKeys = Object.keys(questionnaires[category]).filter(key => key !== 'personaData');
+      
+      docKeys.forEach(doc => {
         const questionnaire = questionnaires[category][doc].doc.questionnaire;
         Object.keys(questionnaire).forEach(questionId => {
           const question = questionnaire[questionId].question;
           const answer = questionnaire[questionId].answer;
-
+    
           if (!questionCounts[question]) {
             questionCounts[question] = {};
           }
@@ -281,11 +299,9 @@ const Adminpanel = () => {
       const responseData = await response.json();
 
       if (!responseData.success && !responseData.idInUse) {
-        console.log('Die ID darf nicht leer sein!');
         setSnackbarMessage(responseData.message)
         setWarningSnackbar(true)
       } else if (!responseData.success && responseData.idInUse) {
-        console.log('Die ID ist bereits in verwendung. Trotzdem fortfahren?');
         setOpenIDSnackbar(true);
       } else {
         const response = await fetch('http://localhost:3000/api/force-set-id', {
@@ -333,6 +349,23 @@ const Adminpanel = () => {
     } finally {
       setLoading(false);
       setOpenIDSnackbar(false);
+    }
+  };
+
+  const handleSetPersona = async (personaName : string) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/setPersona', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ selectedPersona : personaName }),
+      });
+      if (!response.ok) {
+        throw new Error('Fehler bei: /api/setPersona');
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
@@ -425,6 +458,34 @@ const Adminpanel = () => {
 
   const isHexColor = (str: string) => /^#[0-9A-F]{6}$/i.test(str);
 
+  
+  const PersonaDropdown = () => {
+  
+    const handleChange = (event: SelectChangeEvent<string>) => {
+      setSelectedPersona(event.target.value);
+      handleSetPersona(event.target.value);
+    };
+  
+    return (
+      <FormControl fullWidth style={{marginTop:'20px'}}>
+          <InputLabel id="persona-select-label">Select Persona</InputLabel>
+        <Select
+          labelId="persona-select-label"
+          id="persona-select"
+          value={selectedPersona}
+          onChange={handleChange}
+          label="Select Persona"
+        >
+          {Personas.map((persona) => (
+            <MenuItem key={persona.userId} value={persona.roles[0]}>
+              {persona.roles[0]}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    );
+  };
+
   return (
     <Container maxWidth={false} style={{ padding: 0 }}>
       <Box display="flex" justifyContent="center" alignItems="center" style={{ width: '100%', height: '100vh' }}>
@@ -433,29 +494,30 @@ const Adminpanel = () => {
             {/* Set ID and Hosting der KI section */}
             <Box display="flex" justifyContent="space-between" gap={3}>
               <Box display="flex" flexDirection="column" gap={1}>
-                <Box display="flex" alignItems="center">
-                  <Typography variant="h4" gutterBottom style={{ marginBottom: '5px'}}>Set Tester-ID</Typography>
-                  <IconWithCard cardContent="This is the ID under which the Questionnaire in the 'Questionnaire AI' Tab will be saved." showOnTop={false} />
-                </Box>
-                <TextField
-                  label="ID"
-                  variant="outlined"
-                  value={id}
-                  onChange={(e) => setId(e.target.value)}
-                  fullWidth
-                />
-              <Typography style={{fontSize: '14px' }}>Current ID: {currentId}</Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleTrySetId}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.palette.primary.dark}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = theme.palette.primary.main}
-                onMouseDown={(e) => e.currentTarget.style.backgroundColor = theme.palette.primary.light}
-                onMouseUp={(e) => e.currentTarget.style.backgroundColor = theme.palette.primary.dark}
-              >
-                Set ID
-              </Button>
+                  <Box display="flex" alignItems="center">
+                    <Typography variant="h4" gutterBottom style={{ marginBottom: '5px'}}>Set Tester-ID</Typography>
+                    <IconWithCard cardContent="This is the ID under which the Questionnaire in the 'Questionnaire AI' Tab will be saved." showOnTop={false} />
+                  </Box>
+                  <TextField
+                    label="ID"
+                    variant="outlined"
+                    value={id}
+                    onChange={(e) => setId(e.target.value)}
+                    fullWidth
+                  />
+                <Typography style={{fontSize: '14px' }}>Current ID: {currentId}</Typography>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleTrySetId}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.palette.primary.dark}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = theme.palette.primary.main}
+                  onMouseDown={(e) => e.currentTarget.style.backgroundColor = theme.palette.primary.light}
+                  onMouseUp={(e) => e.currentTarget.style.backgroundColor = theme.palette.primary.dark}
+                >
+                  Set ID
+                </Button>
+                <PersonaDropdown />
               </Box>
       
               <Box display="flex" flexDirection="column" gap={1}>
@@ -542,11 +604,16 @@ const Adminpanel = () => {
               ) : (
                 <>
                   <List>
-                    {Object.entries(questionnaires).map(([category, docs]) => (
+                    {Object.entries(questionnaires).map(([category, docs]) => {
+
+                      return (
                       <Box key={category} mb={2}>
                         <Box display="flex" alignItems="center">
-                          <Typography variant="h6" gutterBottom>
+                          <Typography variant="h6">
                             {category.replace('O4S-ai-', '')}
+                          </Typography>
+                          <Typography variant="body2" style={{ color: 'gray', marginLeft:'12px'}}>
+                             {docs.personaData.doc.personaName}
                           </Typography>
                           <Button
                             variant="contained"
@@ -563,40 +630,42 @@ const Adminpanel = () => {
                               <ListItemText primary="Keine Themes gespeichert" />
                             </ListItem>
                           ) : (
-                            Object.entries(docs).map(([docName]) => (
-                              <ListItem key={docName} divider>
-                                <ListItemText primary={docName} />
-                                <ListItemSecondaryAction>
-                                  <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={() => handleShowQuestionnaire(category, docName)}
-                                    style={{ marginRight: '10px' }}
-                                  >
-                                    Show
-                                  </Button>
-                                  <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={() => handleApplyTheme(category, docName)}
-                                    style={{ marginRight: '10px' }}
-                                  >
-                                    Apply
-                                  </Button>
-                                  <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={() => handleDeleteTheme(category, docName)}
-                                  >
-                                    Delete
-                                  </Button>
-                                </ListItemSecondaryAction>
-                              </ListItem>
-                            ))
-                          )}
+                            Object.entries(docs)
+                              .filter(([docName]) => docName !== 'personaData') // Filter out 'personaData'
+                              .map(([docName]) => (
+                                <ListItem key={docName} divider>
+                                  <ListItemText primary={docName} />
+                                  <ListItemSecondaryAction>
+                                    <Button
+                                      variant="contained"
+                                      color="primary"
+                                      onClick={() => handleShowQuestionnaire(category, docName)}
+                                      style={{ marginRight: '10px' }}
+                                    >
+                                      Show
+                                    </Button>
+                                    <Button
+                                      variant="contained"
+                                      color="primary"
+                                      onClick={() => handleApplyTheme(category, docName)}
+                                      style={{ marginRight: '10px' }}
+                                    >
+                                      Apply
+                                    </Button>
+                                    <Button
+                                      variant="contained"
+                                      color="primary"
+                                      onClick={() => handleDeleteTheme(category, docName)}
+                                    >
+                                      Delete
+                                    </Button>
+                                  </ListItemSecondaryAction>
+                                </ListItem>
+                              )))}
                         </List>
                       </Box>
-                    ))}
+                      )
+                            })}
                   </List>
                   {showJsonToShowPopup &&
                     <QuestionnairePopup onClose={handleClosePopup} questions={jsonToShow} />
