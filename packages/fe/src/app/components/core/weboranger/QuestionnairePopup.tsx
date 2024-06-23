@@ -28,8 +28,8 @@ const QuestionnairePopup: React.FC<QuestionnairePopupProps> = ({ onClose, questi
     <Box
       sx={{
         position: 'fixed',
-        top: '50%',
-        left: '50%',
+        top: '60%',
+        left: '49%',
         transform: 'translate(-50%, -50%)',
         backgroundColor: '#fff',
         padding: '20px',

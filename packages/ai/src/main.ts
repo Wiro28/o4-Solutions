@@ -216,8 +216,12 @@ app.get('/getDocs', async (req, res) => {
   res.json(docs);
 });
 
-app.get('/getLastTheme', async (req, res) => {
+app.get('/getTheme', async (req, res) => {
   res.json({ theme: applyedTheme })
+});
+
+app.get('/getLastGeneratedTheme', async (req, res) => {
+  res.json({ theme: latestGeneratedTheme })
 });
 
 //Is das ein sicherheitsrisiko wenn man einfach den body einer anfrage nimmt und settet?

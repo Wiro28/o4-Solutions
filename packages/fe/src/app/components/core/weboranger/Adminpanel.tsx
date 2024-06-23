@@ -439,7 +439,6 @@ const Adminpanel = () => {
         throw new Error('Fehler bei: /getDoc');
       } else {
         const data = await response.json();
-        console.log("Received Data to show: ", data)
       //!!!!!
         setJsonToShow(data.theme.questionnaire); // Setze das empfangene JSON in den State
         setShowJsonToShowPopup(true); // Zeige das Popup an
@@ -523,7 +522,7 @@ const Adminpanel = () => {
               <Box display="flex" flexDirection="column" gap={1}>
                 <Box display="flex" alignItems="center">
                   <Typography variant="h4" gutterBottom style={{ marginBottom: '5px'}}>AI Hosting</Typography>
-                  <IconWithCard cardContent="Decide if you want to send a request to your local-hosted AI or to the AI on our server. Note: The AI you host locally should be run by ollama." showOnTop={true} />
+                  <IconWithCard cardContent="Decide if you want to send a request to your local-hosted AI or to the AI on our server. Note: The AI you host locally should be run by ollama." showOnTop={false} />
                 </Box>
                 <Select style={{ width:'200px'}}
                   value={aiSourceID}
@@ -639,7 +638,8 @@ const Adminpanel = () => {
                                     <Button
                                       variant="contained"
                                       color="primary"
-                                      onClick={() => handleShowQuestionnaire(category, docName)}
+                                      onMouseOver={() => handleShowQuestionnaire(category, docName)}
+                                      onMouseOut={handleClosePopup}
                                       style={{ marginRight: '10px' }}
                                     >
                                       Show
@@ -668,7 +668,7 @@ const Adminpanel = () => {
                             })}
                   </List>
                   {showJsonToShowPopup &&
-                    <QuestionnairePopup onClose={handleClosePopup} questions={jsonToShow} />
+                    <QuestionnairePopup questions={jsonToShow} onClose={handleClosePopup} />
                   }
                   <Box display="flex" justifyContent="flex-start">
                     <Button
