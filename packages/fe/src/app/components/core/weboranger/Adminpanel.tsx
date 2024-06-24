@@ -17,6 +17,7 @@ const Adminpanel = () => {
   const theme = useTheme();
 
   const [questionnaires, setQuestionnaires] = useState<docFormat>({});
+  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [id, setId] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
@@ -426,22 +427,25 @@ const Adminpanel = () => {
     }
   };
 
-  const handleShowQuestionnaire = async (category: string, docName: string) => {
+  const handleShowQuestionnaire = async (category: string, docName: string, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     try {
       const response = await fetch('http://localhost:3000/getDoc', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ category: category, docName: docName }),
+        body: JSON.stringify({ category, docName }),
       });
       if (!response.ok) {
         throw new Error('Fehler bei: /getDoc');
       } else {
         const data = await response.json();
-      //!!!!!
-        setJsonToShow(data.theme.questionnaire); // Setze das empfangene JSON in den State
-        setShowJsonToShowPopup(true); // Zeige das Popup an
+        setJsonToShow(data.theme.questionnaire);
+        setPopupPosition({
+          top: event.clientY,
+          left: event.clientX,
+        });
+        setShowJsonToShowPopup(true);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -632,13 +636,13 @@ const Adminpanel = () => {
                             Object.entries(docs)
                               .filter(([docName]) => docName !== 'personaData') // Filter out 'personaData'
                               .map(([docName]) => (
-                                <ListItem key={docName} divider>
+                                <ListItem key={docName} divider style={{ marginTop: '20px' }}>
                                   <ListItemText primary={docName} />
                                   <ListItemSecondaryAction>
                                     <Button
                                       variant="contained"
                                       color="primary"
-                                      onMouseOver={() => handleShowQuestionnaire(category, docName)}
+                                      onMouseOver={(event) => handleShowQuestionnaire(category, docName, event)}
                                       onMouseOut={handleClosePopup}
                                       style={{ marginRight: '10px' }}
                                     >
@@ -663,13 +667,17 @@ const Adminpanel = () => {
                                 </ListItem>
                               )))}
                         </List>
+                        {showJsonToShowPopup && (
+                                    <QuestionnairePopup
+                                      onClose={handleClosePopup}
+                                      questions={jsonToShow}
+                                      position={popupPosition}
+                                    />
+                                  )}
                       </Box>
                       )
                             })}
                   </List>
-                  {showJsonToShowPopup &&
-                    <QuestionnairePopup questions={jsonToShow} onClose={handleClosePopup} />
-                  }
                   <Box display="flex" justifyContent="flex-start">
                     <Button
                       variant="contained"
