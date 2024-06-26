@@ -18,6 +18,9 @@ import Backdrop from '@mui/material/Backdrop';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
+import {User} from "@app/shared/types/core/user/user";
+import {useUser} from "@frontend/hooks/use-user"
+
 interface Question {
   id: number;
   text: string;
@@ -80,28 +83,42 @@ const Questionnaire: React.FC = () => {
   const [openSuccessSnackbar, setSuccessSnackbar] = useState(false);
   const [successSnackbarMessage, setSuccessSnackbarMessage] = useState<string>('');
   const [isAiLoading, setIsAiLoading] = useState<boolean>(); 
+  const [saveButtonGrey, setSaveButtonGrey] = useState<boolean>(); 
   //Die aktuelle ID die in Server gespeichert ist und unter der die Daten in der Datenbank gespeichert werden
   const [currentId, setCurrentId] = useState<string>(() => {
     return localStorage.getItem('currentId') || '';
   });
+  const [personaData] = useUser();
 
   useEffect(() => {
     fetchCurrentTheme();
     fetchCurrentId();
     fetchIsAiLoading();
+    fetchLastGeneratedTheme();
   }, []);
 
-  //Himayat ich weiß du magst die Kommentare nicht aber das muss ich erklären
-  //
-  //Auf dem Server wird gespeichert ob die AI gerade einen prompt bearbeitet oder nicht "isAiLoading" in "main.ts".
-  //Wenn man die Komponente jz neu läd weil man zb im Admin Panel war dann wird eine Anfrage an den Server geschickt um zu gucken ob die AI gerade noch eine Anfrage
-  //bearbeitet oder nicht. Falls ...
-  //... nein passiert nichts.
-  //... falls ja wird eine while schleife aktiviert die alle 2sek den Server frägt ob die AI schon fertig ist.
-  //
-  //Ich weiß es ist XXL Sphagetti Code aber ich habe keinen weg gefunden wie der Server dem "questionnaire.tsx" "sagt", dass er mit der Anfrage fertig ist.
-  //
-  //Der ganze lachs nur weil "setLoading(false)" im finally block von andle Submit nicht tut was es soll
+  const fetchLastGeneratedTheme = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/getLastGeneratedTheme');
+      if (!response.ok) {
+        throw new Error('Fehler bei: /getLastGeneratedTheme');
+      }
+      const data = await response.json();
+      console.log("Data :", data)
+      if (Object.keys(data.theme).length === 0) {
+        console.log("Button grey = true");
+        setSaveButtonGrey(true);
+      }
+       else {
+        console.log("Button grey = false")
+        setSaveButtonGrey(false)
+      }
+    } catch (error) {
+      console.error('Error fetching current theme:', error);
+    }
+  };
+
+  //Überprüft ob die AI noch am Laden ist nachdem man die Komponente neu läd um dann die Ladeanzeigt weiter anzeugen zu lassen
   const fetchIsAiLoading = async () => {
     try {
       const response = await fetch('http://localhost:3000/getIsAiLoading');
@@ -133,9 +150,9 @@ const Questionnaire: React.FC = () => {
 
   const fetchCurrentTheme = async () => {
     try {
-      const response = await fetch('http://localhost:3000/getLastTheme');
+      const response = await fetch('http://localhost:3000/getTheme');
       if (!response.ok) {
-        throw new Error('Fehler bei: /getLastTheme');
+        throw new Error('Fehler bei: /getTheme');
       }
       const data = await response.json();
       applyTheme(data.theme);
@@ -207,13 +224,15 @@ const Questionnaire: React.FC = () => {
   const handleSave = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setLoading(true);
+    const personaName = personaData.displayName;
+    console.log("PersonaName in Questionnaire: ", personaName)
     try {
       const response = await fetch('http://localhost:3000/api/save-questionnaire', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: responses, saveUnder }),
+        body: JSON.stringify({ message: responses, saveUnder, personaName }),
       });
       if (!response.ok) {
         throw new Error('Fehler bei: /api/save-questionnaire');
@@ -252,6 +271,7 @@ const Questionnaire: React.FC = () => {
       const responseJson = await response.json();
       if (responseJson.successFullConnectionToAi) {
         applyTheme(responseJson.theme);
+        setSaveButtonGrey(false)
       } else {
         setWarningSnackbarMessage(responseJson.message);
         setWarningSnackbar(true);
@@ -328,7 +348,6 @@ const Questionnaire: React.FC = () => {
             percentage
           />
         </Box>
-
         <Button
           variant="contained"
           color="primary"
@@ -362,6 +381,7 @@ const Questionnaire: React.FC = () => {
             onMouseUp={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.dark)}
             fullWidth
             style={{ marginTop: 0 }}
+            disabled={saveButtonGrey}
           >
             Save
           </Button>

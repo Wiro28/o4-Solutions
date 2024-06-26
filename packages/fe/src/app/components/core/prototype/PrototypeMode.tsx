@@ -30,6 +30,10 @@ const PrototypeMode = (props: PrototypeModeProps) => {
       <i>It's possible to turn the prototype into a production-ready application by connecting it to a real database (Postgres) and set up an authentication server like Keycloak.
         Please contact the <Link href="https://prooph-software.de/#board">prooph board team</Link> for more information.</i>
     </Alert>
+    <p>This Version of the Cody Engine supports <strong>AI generated</strong> custom Themes! The AI will generate, based on your individual preferences, a theme which will be applied automatically.
+       You can try it by filling out the questionnaire in the "Questionnaire AI" tab and submitting your answers to the AI. Have fun!
+    </p>
+    <p><i>Created by O4-Solutions</i></p>
     <Typography variant="h3" display="block" width={'100%'} marginTop={'30px'}>Personas</Typography>
     <p>Instead of real users, you can switch personas in prototype mode. Personas can be configured in <i>[project_root]/packages/shared/extensions/personas.ts</i></p>
     <Grid2 container={true} rowSpacing={2} spacing={2} sx={{alignItems: 'stretch'}}>

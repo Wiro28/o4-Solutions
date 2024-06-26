@@ -2,7 +2,7 @@ import express from 'express';
 import { askAI } from './aiInterface';
 import cors from 'cors';
 import { generateAIPrompt } from './promptGenerator';
-import { saveDoc, getDoc, checkIfIDInUse, checkIfDocIsExisting, getAllDocs, deleteEverything, deleteDoc, deleteID, getAiSource, setAiSource, getAllDocsForSpecificId, doc } from './storageController';
+import { saveDoc, getDoc, checkIfIDInUse, checkIfDocIsExisting, getAllDocs, deleteEverything, deleteDoc, deleteID, getAiSource, setAiSource, getAllDocsForSpecificId, doc, savePersonaUnderID, personaData, getPersonaForID } from './storageController';
 
 // Erstellen einer neuen Express-Anwendung
 const app = express();
@@ -17,6 +17,9 @@ let applyedTheme = {};
 // Die ID mit der der User gerade "angemeldet" ist
 let currentID: string;
 
+// Die Persona mit der die ID abgespeichert wird. Standartmäßig die Standart Persona
+let currentPersona: string;
+
 //Ist nur true während die AI eine Anfrage bearbeitet
 let isAiLoading = false;
 
@@ -26,27 +29,20 @@ let lastDeletedThemeData : DeletedThemeData | null = null;
 interface DeletedThemeData {
   id: string;
   docName: string;
-  themeandquestionnaire: {
-    json: any;  
-    questionnaire: any;  
-  };
+  themeandquestionnaire: doc;
 }
 
 //Die ID welche zuletzt gelöscht wurde
 let lastDeletedIdData : DeletedIDData | null = null;
 
-interface Theme {
-  doc: {
-    json: object;
-    questionnaire: object;
-  };
-}
-
 interface DeletedIDData {
   id: string;
   themes: {
-    [key: string]: Theme;
-  };
+    [key: string]: {
+      doc : doc
+    }
+  }
+  personaData : any;
 }
 
 // CORS und JSON Middleware verwenden
@@ -159,6 +155,7 @@ app.post('/api/try-set-id', async (req, res) => {
     res.json({ success: false, idInUse: true, message: "Die ID ist bereits in verwendung" })
   } else {
     currentID = data.id
+    await savePersonaUnderID(currentID, currentPersona)
     //console.log(`Die jetzige ID nach try-set-id ist: ${currentID}`)
     res.json({ success: true, idInUse: false, message: "Alles supi" })
 
@@ -168,14 +165,29 @@ app.post('/api/try-set-id', async (req, res) => {
 app.post('/api/force-set-ID', async (req, res) => {
   const data = req.body;
   currentID = data.id
+  await savePersonaUnderID(currentID, currentPersona)
   res.json({ success: true })
   //console.log(`Die jetzige ID ist nach force-set-id ist: ${currentID}`)
+});
+
+app.post('/api/setPersona', async (req, res) => {
+  const data = req.body;
+  currentPersona = data.selectedPersona
+  console.log(data.selectedPersona)
+  res.json({ success: true })
+});
+
+app.get('/api/getPersona', async (req, res) => {
+  if (!currentPersona) {
+    res.json({ currentPersona: "" })
+  } else {
+    res.json({ currentPersona })
+  }
 });
 
 // Speichert questionaire und json direkt ab
 app.post('/api/save-questionnaire', async (req, res) => {
   const data = req.body;
-
   if (!data.saveUnder) {
     res.json({ success: false, message: "Please choose a name under which to save the theme!" })
   } else if (!currentID) {
@@ -204,8 +216,12 @@ app.get('/getDocs', async (req, res) => {
   res.json(docs);
 });
 
-app.get('/getLastTheme', async (req, res) => {
+app.get('/getTheme', async (req, res) => {
   res.json({ theme: applyedTheme })
+});
+
+app.get('/getLastGeneratedTheme', async (req, res) => {
+  res.json({ theme: latestGeneratedTheme })
 });
 
 //Is das ein sicherheitsrisiko wenn man einfach den body einer anfrage nimmt und settet?
@@ -253,10 +269,14 @@ app.put('/undoDeleteDoc', async (req, res) => {
 });
 
 app.post('/deleteID', async (req, res) => {
+  console.log("delteID wurde aufgerufen")
   const data = req.body
   const themes = await getAllDocsForSpecificId(data.category)
+  console.log("Die zwischengespeicherten Themes sind: ", themes)
+  const personaData : personaData | null = await getPersonaForID(data.category)
+  console.log("Die zwischengespeicherten Persona ist: ", personaData)
   if (data.category){
-    lastDeletedIdData = { id: data.category, themes : themes }
+    lastDeletedIdData = { id: data.category, themes : themes, personaData }
     await deleteID(data.category)
     res.status(200).json({ success: true, ok: true });
   } else {
@@ -264,12 +284,26 @@ app.post('/deleteID', async (req, res) => {
   }
 });
 
+export interface personaDoc extends doc {
+  doc: {
+    personaName: string;
+  };
+}
+
 app.put('/undoDeleteID', async (req, res) => {
+  console.log("UndoDelteID wurde aufgerufen")
   if(lastDeletedIdData) {
     for (const key in lastDeletedIdData.themes) {
       const keyAsString = key;
-      saveDoc(lastDeletedIdData.id.replace('O4S-ai-', ''), keyAsString, lastDeletedIdData.themes[key].doc.json, lastDeletedIdData.themes[key].doc.questionnaire);
-    }
+      console.log("Key für Theme ist: ", keyAsString)
+      console.log("lastDeletedIdData.themes[key].json ist: ", lastDeletedIdData.themes[key])
+      if (keyAsString === "personaData"){
+      const ichKannNichtMehrIchWillSchlafen : personaDoc = lastDeletedIdData.themes[key] as unknown as personaDoc;
+      await savePersonaUnderID(lastDeletedIdData.id.replace('O4S-ai-', ''), ichKannNichtMehrIchWillSchlafen.doc.personaName)
+      } else {
+      await saveDoc(lastDeletedIdData.id.replace('O4S-ai-', ''), keyAsString, lastDeletedIdData.themes[key].doc.json, lastDeletedIdData.themes[key].doc.questionnaire);
+      }
+    } 
     res.status(200).json({ success: true, ok: true });
     lastDeletedIdData = null
   } else {

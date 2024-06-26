@@ -2,19 +2,23 @@ import React, { useEffect } from 'react';
 import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 
 interface QuestionnairePopupProps {
-  onClose: () => void; // Funktion zum Schließen des Popups
+  onClose: () => void;
   questions: {
     [index: string]: {
       question: string;
       answer: string;
     };
   };
+  position: {
+    top: number;
+    left: number;
+  };
 }
 
-const QuestionnairePopup: React.FC<QuestionnairePopupProps> = ({ onClose, questions }) => {
+const QuestionnairePopup: React.FC<QuestionnairePopupProps> = ({ onClose, questions, position }) => {
   useEffect(() => {
     const handleScroll = () => {
-      onClose(); // Popup schließen
+      onClose();
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -24,13 +28,15 @@ const QuestionnairePopup: React.FC<QuestionnairePopupProps> = ({ onClose, questi
     };
   }, [onClose]);
 
+  const positionTop = position.top - 500;
+  const positionLeft = position.left - 1100;
+
   return (
     <Box
       sx={{
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
+        position: 'absolute',
+        top: `${positionTop}px`,
+        left: `${positionLeft}px`,
         backgroundColor: '#fff',
         padding: '20px',
         boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
