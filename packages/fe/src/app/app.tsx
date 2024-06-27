@@ -24,59 +24,72 @@ import PageDataProvider from "@frontend/app/providers/PageData";
 import ErrorBoundary from "@frontend/app/components/core/ErrorBoundary";
 
 // Verspielt
-import '@fontsource/pacifico/400.css'; 
-import '@fontsource/baloo-2/400.css'; 
-import '@fontsource/caveat/400.css';
-import '@fontsource/indie-flower/400.css';
-import '@fontsource/dancing-script/400.css';
-import '@fontsource/fredoka/400.css';
+import '@fontsource/pacifico'; 
+import '@fontsource/grandstander'; 
+import '@fontsource/caveat';
+import '@fontsource/indie-flower';
+import '@fontsource/happy-monkey';
+import '@fontsource/twinkle-star';
 
 // Schlicht
-import '@fontsource/open-sans/400.css'; 
-import '@fontsource/lato/400.css'; 
-import '@fontsource/montserrat/400.css';
-import '@fontsource/raleway/400.css';
-import '@fontsource/josefin-sans/400.css';
-import '@fontsource/work-sans/400.css';
+import '@fontsource/open-sans'; 
+import '@fontsource/lato'; 
+import '@fontsource/montserrat';
+import '@fontsource/raleway';
+import '@fontsource/josefin-sans';
+import '@fontsource/work-sans';
 
 // Maschinell
-import '@fontsource/roboto-mono/400.css'; 
-import '@fontsource/source-code-pro/400.css'; 
-import '@fontsource/fira-code/400.css';
-import '@fontsource/inconsolata/400.css';
-import '@fontsource/space-mono/400.css';
-import '@fontsource/dm-mono/400.css';
+import '@fontsource/roboto-mono'; 
+import '@fontsource/source-code-pro'; 
+import '@fontsource/fira-code';
+import '@fontsource/inconsolata';
+import '@fontsource/space-mono';
+import '@fontsource/dm-mono';
+import '@fontsource/courier-prime';
+import '@fontsource/press-start-2p';
+import '@fontsource/silkscreen';
 
 // Gerundet
-import '@fontsource/nunito/400.css'; 
-import '@fontsource/quicksand/400.css'; 
-import '@fontsource/comic-neue/400.css';
-import '@fontsource/poppins/400.css';
-import '@fontsource/m-plus-rounded-1c/400.css';
-import '@fontsource/arimo/400.css';
+import '@fontsource/nunito'; 
+import '@fontsource/dongle'; 
+import '@fontsource/comic-neue';
+import '@fontsource/comfortaa';
+import '@fontsource/m-plus-rounded-1c';
+import '@fontsource/dosis';
 
 // Elegant
-import '@fontsource/playfair-display/400.css';
-import '@fontsource/merriweather/400.css';
-import '@fontsource/abril-fatface/400.css';
-import '@fontsource/eb-garamond/400.css';
-import '@fontsource/alex-brush/400.css';
-import '@fontsource/bodoni-moda/400.css';
+import '@fontsource/didact-gothic';
+import '@fontsource/questrial';
+import '@fontsource/average-sans';
+import '@fontsource/libre-franklin';
+import '@fontsource/metropolis';
+import '@fontsource/urbanist';
+import '@fontsource/lexend-zetta';
 
 // Dramatisch
-import '@fontsource/bebas-neue/400.css';
-import '@fontsource/righteous/400.css';
-import '@fontsource/bungee/400.css';
-import '@fontsource/amatic-sc/400.css';
-import '@fontsource/staatliches/400.css';
-import '@fontsource/monoton/400.css';
+import '@fontsource/bebas-neue';
+import '@fontsource/righteous';
+import '@fontsource/bungee';
+import '@fontsource/anton';
+import '@fontsource/staatliches';
+import '@fontsource/monoton';
+import '@fontsource/krona-one';
+import '@fontsource-variable/fredoka';
+import '@fontsource/abril-fatface';
 
 // Sachlich
-import '@fontsource/roboto/400.css'; 
-import '@fontsource/inter/400.css';
-import '@fontsource/ubuntu/400.css';
-import '@fontsource/noto-sans/400.css';
-import '@fontsource/manrope/400.css';
+import '@fontsource/cormorant-garamond';
+import '@fontsource/spectral';
+import '@fontsource/quattrocento';
+import '@fontsource/old-standard-tt';
+import '@fontsource/noto-serif-jp';
+import '@fontsource/bodoni-moda';
+import '@fontsource/roboto'; 
+import '@fontsource/inter';
+import '@fontsource/ubuntu';
+import '@fontsource/noto-sans';
+import '@fontsource/manrope';
 
 export function App() {
   const Layout = (props: React.PropsWithChildren) => {

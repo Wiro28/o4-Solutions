@@ -14,7 +14,7 @@ const OptionsQuestion: React.FC<OptionsProps> = ({ handleInputChange, question, 
         <OptionWithTooltip
           key={index}
           option={option}
-          description={question.tooltips ? question.tooltips[index] : 'No explanaition available'}
+          description={question.tooltips ? question.tooltips[index] : 'No explanation available'}
           isChecked={response.answer === option}
           handleChange={(e) => handleInputChange(e, question.id)}
         />

@@ -4,7 +4,7 @@ import ColorPicker from '@frontend/app/components/core/weboranger/ColorPicker';
 import SliderComponent from '@frontend/app/components/core/weboranger/SliderComponent';
 import OptionsQuestion from '@frontend/app/components/core/weboranger/OptionsQuestion';
 import TextQuestion from '@frontend/app/components/core/weboranger/TextQuestion';
-import { explanaitions } from './QuestionExplanaitions';
+import { explanations } from './QuestionExplanations';
 import {
   Box,
   Button,
@@ -44,7 +44,7 @@ const Questionnaire: React.FC = () => {
       id: 1,
       text: 'What theme should the application have?',
       options: ['Serious', 'Energetic', 'Cheerful', 'Nature-oriented', 'Technical', 'Minimalistic', 'Premium'],
-      tooltips: [explanaitions.whatTheme.serious, explanaitions.whatTheme.energetic, explanaitions.whatTheme.cheerful, explanaitions.whatTheme.natureOriented, explanaitions.whatTheme.technical, explanaitions.whatTheme.minimalistic, explanaitions.whatTheme.premium],
+      tooltips: [explanations.whatTheme.serious, explanations.whatTheme.energetic, explanations.whatTheme.cheerful, explanations.whatTheme.natureOriented, explanations.whatTheme.technical, explanations.whatTheme.minimalistic, explanations.whatTheme.premium],
     },
     { id: 2, text: 'Is there a specific color the application should have?', colorPicker: true},
     { id: 3, text: 'How strong should the color weighting be?', slider: true },
@@ -52,7 +52,7 @@ const Questionnaire: React.FC = () => {
       id: 4,
       text: 'What theme should the font have?',
       options: ['Playful', 'Simple', 'Mechanical', 'Rounded', 'Elegant', 'Dramatic', 'Factual'],
-      tooltips: [explanaitions.whatFont.playful, explanaitions.whatFont.simple, explanaitions.whatFont.mechanical, explanaitions.whatFont.rounded, explanaitions.whatFont.elegant, explanaitions.whatFont.dramatic, explanaitions.whatFont.factual],
+      tooltips: [explanations.whatFont.playful, explanations.whatFont.simple, explanations.whatFont.mechanical, explanations.whatFont.rounded, explanations.whatFont.elegant, explanations.whatFont.dramatic, explanations.whatFont.factual],
     },
   ];
 
