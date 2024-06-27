@@ -1,4 +1,5 @@
 import React from 'react';
+import Box from '@mui/material/Box';
 import OptionWithTooltip from './OptionWithTooltip';
 
 interface OptionsProps {
@@ -9,7 +10,9 @@ interface OptionsProps {
 
 const OptionsQuestion: React.FC<OptionsProps> = ({ handleInputChange, question, response }) => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}>
+    <Box 
+      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start', bgcolor: 'background.paper', p: 2 }}
+    >
       {question.options?.map((option, index) => (
         <OptionWithTooltip
           key={index}
@@ -19,7 +22,7 @@ const OptionsQuestion: React.FC<OptionsProps> = ({ handleInputChange, question, 
           handleChange={(e) => handleInputChange(e, question.id)}
         />
       ))}
-    </div>
+    </Box>
   );
 };
 

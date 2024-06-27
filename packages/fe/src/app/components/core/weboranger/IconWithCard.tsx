@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { Button } from '@mui/material';
 
 interface IconWithCardProps {
   cardContent: string;
@@ -40,7 +39,7 @@ const IconWithCard: React.FC<IconWithCardProps> = ({ cardContent, showOnTop }) =
   }, [isCardVisible]);
 
   return (
-    <Box sx={{ position: 'relative', bottom:'9px', left:'4px'}}>
+    <Box sx={{ position: 'relative', bottom: '9px', left: '4px', bgcolor: 'background.paper' }}>
       <Typography
         ref={iconRef}
         sx={{
@@ -60,16 +59,15 @@ const IconWithCard: React.FC<IconWithCardProps> = ({ cardContent, showOnTop }) =
             position: 'absolute',
             top: verticalPosition,
             left: '0',
-            backgroundColor: '#fff',
+            backgroundColor: 'background.paper',
             boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-            padding: '10px 10px 10px 10px',
+            padding: '10px',
             zIndex: 1000,
             width: '200px'
           }}
           onMouseEnter={showCard}
           onMouseLeave={hideCard}
         >
-
           <Typography>{cardContent}</Typography>
         </Box>
       )}
