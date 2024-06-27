@@ -36,7 +36,6 @@ const Adminpanel = () => {
   //Es werden alle Relevanten Daten vom Server abgefragt um Sie darzustellen
   useEffect(() => {
     fetchQuestionnaires();
-    fetchCurrentTheme();
     fetchAiSource();
     fetchCurrentId();
     fetchCurrentPersona();
@@ -92,20 +91,6 @@ const Adminpanel = () => {
       console.error('Error fetching docFormat:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchCurrentTheme = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/getLastTheme');
-      if (!response.ok) {
-        throw new Error('Fehler bei: /getLastTheme');
-      }
-      const data = await response.json();
-      console.log(data.theme)
-      applyTheme(data.theme)
-    } catch (error) {
-        console.error('Error fetching current ID:', error);
     }
   };
 

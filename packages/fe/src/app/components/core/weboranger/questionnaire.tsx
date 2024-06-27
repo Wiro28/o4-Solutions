@@ -97,7 +97,6 @@ const Questionnaire: React.FC = () => {
 
   //Es werden alle Relevanten Daten vom Server abgefragt um Sie darzustellen
   useEffect(() => {
-    fetchCurrentTheme();
     fetchCurrentId();
     fetchIsAiLoading();
     fetchLastGeneratedTheme();
@@ -151,19 +150,6 @@ const Questionnaire: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching AI status:', error);
-    }
-  };
-
-  const fetchCurrentTheme = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/getTheme');
-      if (!response.ok) {
-        throw new Error('Fehler bei: /getTheme');
-      }
-      const data = await response.json();
-      applyTheme(data.theme);
-    } catch (error) {
-      console.error('Error fetching current theme:', error);
     }
   };
 
