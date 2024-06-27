@@ -28,25 +28,26 @@ const QuestionnairePopup: React.FC<QuestionnairePopupProps> = ({ onClose, questi
     };
   }, [onClose]);
 
-  const positionTop = position.top - 500;
-  const positionLeft = position.left - 1100;
+  const adjustedTop = Math.min(position.top, window.innerHeight - 800); // 400 is an estimated popup height
+  const adjustedLeft = Math.min(position.left, window.innerWidth - 1600); // 600 is an estimated popup width
 
   return (
     <Box
-      sx={{
-        position: 'absolute',
-        top: `${positionTop}px`,
-        left: `${positionLeft}px`,
-        backgroundColor: '#fff',
-        padding: '20px',
-        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-        zIndex: 1000,
-        borderRadius: '5px',
-        minWidth: '300px',
-        maxWidth: '80%',
-        maxHeight: '80%',
-        overflowY: 'auto',
-      }}
+    sx={{
+      position: 'fixed',
+      top: '50%',
+      left: '59%',
+      transform: 'translate(-50%, -50%)',
+      backgroundColor: '#fff',
+      padding: '20px',
+      boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+      zIndex: 1000,
+      borderRadius: '5px',
+      minWidth: '300px',
+      maxWidth: '80%',
+      maxHeight: '80%',
+      overflowY: 'auto',
+    }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
         <Typography variant="h6">Questionnaire</Typography>
