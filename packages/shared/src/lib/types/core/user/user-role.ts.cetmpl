@@ -4,5 +4,3 @@ export const UserRoles = [
 ] as const;
 
 export type UserRole = typeof UserRoles[number];
-
-

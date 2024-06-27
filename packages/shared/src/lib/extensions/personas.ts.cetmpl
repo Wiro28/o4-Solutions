@@ -18,11 +18,11 @@ export const Personas: Persona[] = [
     description: 'Anyone represents a standard user of the app without a specific role. This user has access to functionality that is not explicitly restricted.'
   },
   {
-    displayName: 'Admin',
+    displayName: 'WebOranger Admin',
     userId: '1299cda3-a2f7-4e94-9899-e1e37e5fe088',
     email: 'admin@example.local',
     roles: ['Admin'],
     avatar: '/assets/account-circle-outline.svg',
-    description: 'Admin.'
+    description: 'WebOranger Admin.'
   }
 ];
