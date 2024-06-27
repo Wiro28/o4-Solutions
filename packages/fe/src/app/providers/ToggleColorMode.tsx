@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useMemo, useCallback } from "react";
+import React, { ReactNode, useState, useMemo, useCallback, useEffect } from "react";
 import { ThemeProvider } from '@mui/material/styles';
 import { createTheme } from "@frontend/app/layout/theme";
 
@@ -38,6 +38,24 @@ const ToggleColorMode = ({ children }: Props) => {
     }),
     [mode, toggleColorMode, themeConfig, applyTheme]
   );
+
+  // // Aktualisiert immer auf den aktuellen Theme
+  // useEffect(() => {
+  //   const fetchCurrentTheme = async () => {
+  //     try {
+  //       const response = await fetch('http://localhost:3000/getTheme');
+  //       if (!response.ok) {
+  //         throw new Error('Error fetching theme');
+  //       }
+  //       const data = await response.json();
+  //       applyTheme(data.theme);
+  //     } catch (error) {
+  //       console.error('Error fetching current theme:', error);
+  //     }
+  //   };
+
+  //   fetchCurrentTheme();
+  // }, [applyTheme]);
 
   // Erstellen des Themes
   const theme = useMemo(() => {
