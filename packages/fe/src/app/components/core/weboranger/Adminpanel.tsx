@@ -2,11 +2,9 @@ import React, { useContext, useEffect, useState } from "react";
 import { Box, Button, CircularProgress, Container, Typography, Backdrop, Snackbar, List, ListItem, ListItemText, ListItemSecondaryAction, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, useTheme, Divider, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { ThemeContext } from '@frontend/app/providers/ToggleColorMode';
-import theme from "@frontend/extensions/app/layout/theme";
 import IconWithCard from './IconWithCard';
 import QuestionnairePopup from "./QuestionnairePopup";
 import {Personas} from "@app/shared/extensions/personas"
-import { relative } from "path";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -17,7 +15,6 @@ const Adminpanel = () => {
   const theme = useTheme();
 
   const [questionnaires, setQuestionnaires] = useState<docFormat>({});
-  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [id, setId] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
@@ -36,6 +33,7 @@ const Adminpanel = () => {
     return localStorage.getItem('currentId') || '';
   });
 
+  //Es werden alle Relevanten Daten vom Server abgefragt um Sie darzustellen
   useEffect(() => {
     fetchQuestionnaires();
     fetchCurrentTheme();
@@ -111,6 +109,7 @@ const Adminpanel = () => {
     }
   };
 
+  //Handler Methode für den APPLY button
   const handleApplyTheme = async (category: string, docName: string) => {
     try {
       const response = await fetch('http://localhost:3000/getDoc', {
@@ -149,7 +148,7 @@ const Adminpanel = () => {
     setOpenSuccessSnackbar(true);
   };
 
-  //dev methode alle einträge zu löschen
+  //Hadler Methode für den DELETE ALL DATA button. Löscht alle Einträge in der Datenbank
   const handleDeleteEverything = async () => {
     setLoading(true);
     try {
@@ -169,7 +168,7 @@ const Adminpanel = () => {
     }
   };
 
-
+  //Handler Methode  für den DELETE Button. Löscht das Theme
   const handleDeleteTheme = async (category: string, docName: string) => {
     try {
       const response = await fetch('http://localhost:3000/deleteDoc', {
@@ -194,6 +193,7 @@ const Adminpanel = () => {
     }
   };
 
+  //Handlermethode für den DELETE ID button. Löscht die ID und all ihre einträge.
   const handleDeleteID = async (category: string) => {
     try {
       const response = await fetch('http://localhost:3000/deleteID', {
@@ -218,6 +218,7 @@ const Adminpanel = () => {
     }
   };
 
+  //Handlermethode für den APPLY DEFAULT THEME button. Applyt den Default Theme.
   const setDefaultTheme = async () => {
     try {
       const response = await fetch('http://localhost:3000/setAppliedTheme', {
@@ -236,6 +237,7 @@ const Adminpanel = () => {
     applyTheme({});
   };
 
+  //Ein interface das bekannt ist wie ein Dokument welches aus der Datenbank kommt aussieht.
   interface docFormat {
     [category: string]: {
       [docName: string]: {
@@ -284,6 +286,7 @@ const Adminpanel = () => {
     return questionCounts;
   };
 
+  //Handlermethode für SET ID. Hier wird erst versucht die ID zu setzen und geprüft ob diese ID bereits existiert.
   const handleTrySetId = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     try {
@@ -327,6 +330,7 @@ const Adminpanel = () => {
     }
   };
 
+    //Handlermethode für SET ID in der Snackbarmessage, falls die ID scon gesetzt ist der Nutzer diese ID aber trotzdem setzen will.
   const handleForceSetId = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     try {
@@ -353,6 +357,7 @@ const Adminpanel = () => {
     }
   };
 
+  //Handlermethode für das Select Person Dropdown. Setzt die Persona für die ID.
   const handleSetPersona = async (personaName : string) => {
     try {
       const response = await fetch('http://localhost:3000/api/setPersona', {
@@ -370,6 +375,7 @@ const Adminpanel = () => {
     }
   };
 
+  //Handlerethode für das AI-Hosting dropdown. Entscheided ob die AI Lokal oder Serverseitig angesprochen wird.
   const switchAiSource = async (event: { target: { value: any; }; }) => {
     const selectedValue = event.target.value;
     setAiSourceID(selectedValue);
@@ -391,6 +397,7 @@ const Adminpanel = () => {
     }
   };
 
+  //Eventhandler Methode für den UNDO button wenn man ein Theme löscht. Stellt das Theme wieder her.
   const handleUndoDeleteTheme = async () => {
     try {
       const response = await fetch('http://localhost:3000/undoDeleteDoc', {
@@ -409,6 +416,7 @@ const Adminpanel = () => {
     }
   };
 
+    //Eventhandler Methode für den UNDO button wenn man eine ID löscht. Stellt die ID mit allen themes wieder her.
   const handleUndoDeleteID = async () => {
     try {
       const response = await fetch('http://localhost:3000/undoDeleteID', {
@@ -427,6 +435,7 @@ const Adminpanel = () => {
     }
   };
 
+  //Eventhandler Methode für den SHOW button. Beim drüberhover zeigt es alle Fragen und Antworten an die benutzt wurden um den Theme zu generieren.
   const handleShowQuestionnaire = async (category: string, docName: string, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     try {
       const response = await fetch('http://localhost:3000/getDoc', {
@@ -441,10 +450,6 @@ const Adminpanel = () => {
       } else {
         const data = await response.json();
         setJsonToShow(data.theme.questionnaire);
-        setPopupPosition({
-          top: event.clientY,
-          left: event.clientX,
-        });
         setShowJsonToShowPopup(true);
       }
     } catch (error) {
@@ -461,7 +466,7 @@ const Adminpanel = () => {
 
   const isHexColor = (str: string) => /^#[0-9A-F]{6}$/i.test(str);
 
-  
+  //Die komponente für das Personadropdown
   const PersonaDropdown = () => {
   
     const handleChange = (event: SelectChangeEvent<string>) => {
@@ -671,7 +676,6 @@ const Adminpanel = () => {
                                     <QuestionnairePopup
                                       onClose={handleClosePopup}
                                       questions={jsonToShow}
-                                      position={popupPosition}
                                     />
                                   )}
                       </Box>

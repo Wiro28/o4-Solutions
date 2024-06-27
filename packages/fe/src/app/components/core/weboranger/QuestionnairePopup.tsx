@@ -9,13 +9,9 @@ interface QuestionnairePopupProps {
       answer: string;
     };
   };
-  position: {
-    top: number;
-    left: number;
-  };
 }
 
-const QuestionnairePopup: React.FC<QuestionnairePopupProps> = ({ onClose, questions, position }) => {
+const QuestionnairePopup: React.FC<QuestionnairePopupProps> = ({ onClose, questions }) => {
   useEffect(() => {
     const handleScroll = () => {
       onClose();
@@ -27,9 +23,6 @@ const QuestionnairePopup: React.FC<QuestionnairePopupProps> = ({ onClose, questi
       window.removeEventListener('scroll', handleScroll);
     };
   }, [onClose]);
-
-  const adjustedTop = Math.min(position.top, window.innerHeight - 800); // 400 is an estimated popup height
-  const adjustedLeft = Math.min(position.left, window.innerWidth - 1600); // 600 is an estimated popup width
 
   return (
     <Box

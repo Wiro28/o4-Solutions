@@ -17,8 +17,6 @@ import {
 import Backdrop from '@mui/material/Backdrop';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
-
-import {User} from "@app/shared/types/core/user/user";
 import {useUser} from "@frontend/hooks/use-user"
 
 interface Question {
@@ -38,6 +36,7 @@ const Questionnaire: React.FC = () => {
   const theme = useTheme();
   const [temperature, setTemperature] = useState<number>(0.9);
 
+  //Die angezeigten Fragen in Questionnaire
   const questions: Question[] = [
     {
       id: 1,
@@ -81,8 +80,7 @@ const Questionnaire: React.FC = () => {
   const [openWarningSnackbar, setWarningSnackbar] = useState(false);
   const [warningSnackbarMessage, setWarningSnackbarMessage] = useState<string>('');
   const [openSuccessSnackbar, setSuccessSnackbar] = useState(false);
-  const [successSnackbarMessage, setSuccessSnackbarMessage] = useState<string>('');
-  const [isAiLoading, setIsAiLoading] = useState<boolean>(); 
+  const [successSnackbarMessage, setSuccessSnackbarMessage] = useState<string>(''); 
   const [saveButtonGrey, setSaveButtonGrey] = useState<boolean>(); 
   //Die aktuelle ID die in Server gespeichert ist und unter der die Daten in der Datenbank gespeichert werden
   const [currentId, setCurrentId] = useState<string>(() => {
@@ -90,6 +88,7 @@ const Questionnaire: React.FC = () => {
   });
   const [personaData] = useUser();
 
+  //Es werden alle Relevanten Daten vom Server abgefragt um Sie darzustellen
   useEffect(() => {
     fetchCurrentTheme();
     fetchCurrentId();
@@ -178,6 +177,7 @@ const Questionnaire: React.FC = () => {
     localStorage.setItem('responses', JSON.stringify(responses));
   }, [responses]);
 
+
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
     id: number,
@@ -221,6 +221,7 @@ const Questionnaire: React.FC = () => {
     });
   };
 
+  //Handlermethode für den SAVE button. Saved das Questionnaire und Theme in der Datenbank wenn alle Bedingungen erfüllt sind.
   const handleSave = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setLoading(true);
@@ -253,10 +254,10 @@ const Questionnaire: React.FC = () => {
     }
   };
 
+  //Handlermethode für den SUBMIT button. Schickt den Fragebogen mit Antworten an die KI.
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setLoading(true);
-    setIsAiLoading(true);
     try {
       const response = await fetch('http://localhost:3000/api/generate-with-ai', {
         method: 'POST',
@@ -280,7 +281,6 @@ const Questionnaire: React.FC = () => {
     } catch (error) {
       console.error('Error in /api/generate-with-ai', error);
     } finally {
-      setIsAiLoading(false)
       setLoading(false);
     }
   };
