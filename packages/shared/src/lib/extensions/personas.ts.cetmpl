@@ -23,6 +23,6 @@ export const Personas: Persona[] = [
     email: 'admin@example.local',
     roles: ['Admin'],
     avatar: '/assets/account-circle-outline.svg',
-    description: 'WebOranger Admin.'
+    description: 'The admin for the WebOranger AI extension. This user has access to the Adminpanel where he can manage the AI generated themes.'
   }
 ];
