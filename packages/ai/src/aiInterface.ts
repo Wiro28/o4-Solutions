@@ -20,7 +20,7 @@ export async function askAI(AIprompt: string, aiSource: 'local' | 'server', temp
     try {
         const aiInstance = aiSource === 'local' ? openaiLocal : openaiServer;
         const response = await aiInstance.chat.completions.create({
-            model: aiSource === 'local' ? "llama3" : "codestral",
+            model: aiSource === 'local' ? "codestral" : "codestral",
             response_format: { "type": "json_object" },
             messages: JSON.parse(AIprompt).messages,
             temperature: temperature,
