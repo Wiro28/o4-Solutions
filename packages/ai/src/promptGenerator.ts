@@ -223,7 +223,7 @@ function generateAIPrompt(preferences: Preferences, previousResponse: string | n
       { role: 'user', content: `Change the layout/positioning and most importantly order of components noticeably. Like reverse it or change from column to row and stuff.` },
       { role: 'user', content: `Never leave the default options or empty strings or null and never leave any placeholders.` },
       { role: 'user', content: `Check if there are any invalid/illegal functions or things in the MUI Theme Config JSON.` },
-      { role: 'user', content: `Avoid Unsupported color errors` }
+      { role: 'user', content: `Ensure that your contrastText, default, and paper properties are strings, not arrays. For example, choose a single color for each mode` }
     ]
   });
 }

@@ -18,7 +18,7 @@ import {
 import Backdrop from '@mui/material/Backdrop';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import {useUser} from "@frontend/hooks/use-user"
+import { useUser } from "@frontend/hooks/use-user";
 
 interface Question {
   id: number;
@@ -54,7 +54,7 @@ const Questionnaire: React.FC = () => {
       options: ['Playful', 'Simple', 'Mechanical', 'Rounded', 'Elegant', 'Dramatic', 'Factual'],
       tooltips: [explanaitions.whatFont.playful, explanaitions.whatFont.simple, explanaitions.whatFont.mechanical, explanaitions.whatFont.rounded, explanaitions.whatFont.elegant, explanaitions.whatFont.dramatic, explanaitions.whatFont.factual],
     },
-  ];  
+  ];
 
   const defaultResponses = questions.reduce((acc, question) => {
     acc[question.id] = {
@@ -84,13 +84,16 @@ const Questionnaire: React.FC = () => {
   const [openWarningSnackbar, setWarningSnackbar] = useState(false);
   const [warningSnackbarMessage, setWarningSnackbarMessage] = useState<string>('');
   const [openSuccessSnackbar, setSuccessSnackbar] = useState(false);
-  const [successSnackbarMessage, setSuccessSnackbarMessage] = useState<string>(''); 
-  const [saveButtonGrey, setSaveButtonGrey] = useState<boolean>(); 
+  const [successSnackbarMessage, setSuccessSnackbarMessage] = useState<string>('');
+  const [saveButtonGrey, setSaveButtonGrey] = useState<boolean>();
   //Die aktuelle ID die in Server gespeichert ist und unter der die Daten in der Datenbank gespeichert werden
   const [currentId, setCurrentId] = useState<string>(() => {
     return localStorage.getItem('currentId') || '';
   });
   const [personaData] = useUser();
+
+  const [submitButtonColor, setSubmitButtonColor] = useState(theme.palette.primary.main);
+  const [saveButtonColor, setSaveButtonColor] = useState(theme.palette.primary.main);
 
   //Es werden alle Relevanten Daten vom Server abgefragt um Sie darzustellen
   useEffect(() => {
@@ -112,7 +115,7 @@ const Questionnaire: React.FC = () => {
         console.log("Button grey = true");
         setSaveButtonGrey(true);
       }
-       else {
+      else {
         console.log("Button grey = false")
         setSaveButtonGrey(false)
       }
@@ -129,10 +132,10 @@ const Questionnaire: React.FC = () => {
         throw new Error('Fehler bei: /getIsAiLoading');
       }
       const data = await response.json();
-      if(data.isAiLoading){
+      if (data.isAiLoading) {
         setLoading(true);
         let waitingForAiResponse = true;
-        while(waitingForAiResponse){
+        while (waitingForAiResponse) {
           //Die 2000 steht für die Anzahl an ms für die Gewartet wird bis eine neue Anfrage an den Server geschickt wird ob die KI nun fertiggeneriert hat.
           await new Promise(resolve => setTimeout(resolve, 2000));
           const response = await fetch('http://localhost:3000/getIsAiLoading');
@@ -276,18 +279,28 @@ const Questionnaire: React.FC = () => {
       const responseJson = await response.json();
       if (responseJson.successFullConnectionToAi) {
         applyTheme(responseJson.theme);
-        setSaveButtonGrey(false)
+        setSubmitButtonColor(theme.palette.primary.main);
+        setSaveButtonGrey(false);
       } else {
         setWarningSnackbarMessage(responseJson.message);
         setWarningSnackbar(true);
       }
-      
+
     } catch (error) {
       console.error('Error in /api/generate-with-ai', error);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    setSubmitButtonColor(theme.palette.primary.main);
+    setSaveButtonColor(theme.palette.primary.main);
+  }, [theme]);
+
+  useEffect(() => {
+    fetchLastGeneratedTheme();
+  }, [theme]);
 
   return (
     <Container maxWidth="sm">
@@ -341,7 +354,7 @@ const Questionnaire: React.FC = () => {
           boxShadow={1}
         >
           <Typography variant="h5" fontWeight="light" gutterBottom>
-          Determine the creativity of the AI
+            Determine the creativity of the AI
           </Typography>
           <SliderComponent
             value={temperature}
@@ -356,8 +369,9 @@ const Questionnaire: React.FC = () => {
           variant="contained"
           color="primary"
           onClick={handleSubmit}
+          style={{ backgroundColor: submitButtonColor }}
           onMouseOver={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.dark)}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.main)}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = submitButtonColor)}
           onMouseDown={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.light)}
           onMouseUp={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.dark)}
         >
@@ -379,12 +393,12 @@ const Questionnaire: React.FC = () => {
             variant="contained"
             color="primary"
             onClick={handleSave}
+            style={{ backgroundColor: saveButtonColor, marginTop: 0 }}
             onMouseOver={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.dark)}
-            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.main)}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = saveButtonColor)}
             onMouseDown={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.light)}
             onMouseUp={(e) => (e.currentTarget.style.backgroundColor = theme.palette.primary.dark)}
             fullWidth
-            style={{ marginTop: 0 }}
             disabled={saveButtonGrey}
           >
             Save
