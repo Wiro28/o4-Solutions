@@ -73,6 +73,12 @@ function hasEmptyStrings(value: unknown): boolean {
   return false;
 }
 
+// Helper Funktion zum Überprüfen, ob ein JSON Kommentare enthält
+function containsComments(jsonString: string): boolean {
+  const commentPattern = /\/\*[\s\S]*?\*\/|\/\/.*/g;
+  return commentPattern.test(jsonString);
+}
+
 // Funktion um die KI-Anfrage zu wiederholen, falls die Antwort nicht den Anforderungen entspricht
 async function retryAskAI(AIprompt: string, preferences: any, temperature: number, retries = 5) {
   for (let attempt = 1; attempt <= retries; attempt++) {
@@ -89,7 +95,7 @@ async function retryAskAI(AIprompt: string, preferences: any, temperature: numbe
         const extractedJSON = jsonMatch[1].trim();
         console.log(`Extracted JSON: ${extractedJSON}`);
 
-        if (isValidJSON(extractedJSON)) {
+        if (isValidJSON(extractedJSON) && !containsComments(extractedJSON)) {
           const jsonResponse = JSON.parse(extractedJSON);
           console.log(`Valid JSON found on attempt ${attempt}`);
 
@@ -106,7 +112,7 @@ async function retryAskAI(AIprompt: string, preferences: any, temperature: numbe
             AIprompt = generateAIPrompt(preferences, response);
           }
         } else {
-          console.warn(`Attempt ${attempt} failed: Extracted JSON is invalid.`);
+          console.warn(`Attempt ${attempt} failed: Extracted JSON is invalid or contains comments.`);
           AIprompt = generateAIPrompt(preferences, response);
         }
       } else {

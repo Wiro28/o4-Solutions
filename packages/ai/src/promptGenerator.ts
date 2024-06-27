@@ -193,6 +193,12 @@ function generateFontList(preferences: Preferences): string[] {
   return ['Roboto'];
 }
 
+function cleanJsonString(jsonString: string): string {
+  // Remove comments
+  const commentPattern = /\/\*[\s\S]*?\*\/|\/\/.*/g;
+  return jsonString.replace(commentPattern, '');
+}
+
 function generateAIPrompt(preferences: Preferences, previousResponse: string | null = null): string {
   const fontList = generateFontList(preferences);
   const themeDescription = themeMapping[preferences[4].answer] || 'default';
@@ -200,13 +206,15 @@ function generateAIPrompt(preferences: Preferences, previousResponse: string | n
   console.log('Available fonts:', fontList);
   console.log('User preferences:\n', preferences);
 
+  const cleanJsonCode = cleanJsonString(jsonCode);
+
   return JSON.stringify({
     messages: [
       { role: 'system', content: 'You are an AI designed to generate MUI theme configurations based on a given template. Change the given template and generate a new MUI theme configuration.' },
       { role: 'user', content: `Interpret the user preferences into UI/UX guidelines and generate a MUI theme configuration based on those guidelines. User preferences: ${JSON.stringify(preferences, null, 2)}` },
       { role: 'user', content: `The "Farbgewichtung" parameter means: a higher number means to use only the selected color and maybe a second color. A lower number means to use as many colors as you wish to combine. For a high color weight, use primarily the primary color and at most one other color. For a low color weight, use a wider range of colors and combine them as you wish) that fit into the color scheme for the background, primary, and secondary colors.` },
       { role: 'user', content: `Also, consider light and dark mode changes. The default is light mode, but the theme configuration JSON colors should reflect the change when switching to dark mode.` },
-      { role: 'user', content: `Template for the MUI Theme Configuration JSON (Be sure to use this only as a reference, don't keep the default options given here): ${jsonCode}` },
+      { role: 'user', content: `Template for the MUI Theme Configuration JSON (Be sure to use this only as a reference, don't keep the default options given here): ${cleanJsonCode}` },
       { role: 'user', content: `The current theme chosen is "${preferences[4].answer}", which should be interpreted as "${themeDescription}". The chosen theme in the user preferences should be interpreted and UI/UX guidelines should be generated. Ensure distinct and visible changes between themes.` },
       { role: 'user', content: `The font theme means not a specific theme but rather a vibe which the theme should have. Choose a specific theme you see fit. But don't use a standard font, choose something that fits the chosen vibe and also is very distinct and not default. The available fonts for this theme are: ${fontList.join(', ')}` },
       { role: 'user', content: `Everything should be filled out in a way that makes sense and with good UI/UX.` },
