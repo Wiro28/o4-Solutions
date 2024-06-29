@@ -632,8 +632,7 @@ const Adminpanel = () => {
                                     <Button
                                       variant="contained"
                                       color="primary"
-                                      onMouseOver={(event) => handleShowQuestionnaire(category, docName, event)}
-                                      onMouseOut={handleClosePopup}
+                                      onClick={(event) => handleShowQuestionnaire(category, docName, event)}
                                       style={{ marginRight: '10px' }}
                                     >
                                       Show
