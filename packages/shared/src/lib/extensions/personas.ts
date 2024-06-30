@@ -24,5 +24,13 @@ export const Personas: Persona[] = [
     roles: ['Admin'],
     avatar: '/assets/account-circle-outline.svg',
     description: 'The admin for the WebOranger AI extension. This user has access to the Adminpanel where he can manage the AI generated themes.'
+  },
+  {
+    displayName: 'Fleet Manager',
+    userId: '2299cda3-a2f7-4e94-9899-e1e37e5fe088',
+    email: 'fleetmanager@example.local',
+    roles: ['Fleet manager'],
+    avatar: '/assets/account-circle-outline.svg',
+    description: 'Manage the cars of a company.'
   }
 ];
