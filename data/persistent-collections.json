@@ -501,16 +501,6 @@
           "completed": true
         },
         "version": 2
-      },
-      "36db1592-9698-49b3-af74-238d81ce28d8": {
-        "doc": {
-          "vehicleId": "36db1592-9698-49b3-af74-238d81ce28d8",
-          "brand": "BMW",
-          "model": "5er",
-          "productionYear": 2006,
-          "completed": true
-        },
-        "version": 2
       }
     }
   }
